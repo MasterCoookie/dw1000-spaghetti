@@ -395,16 +395,19 @@ void DW1000RangingClass::loop_tag() {
 
 	// expect RESPONSE from POLL recepient
 	if(_expectedMsgId == POLL_ACK) {
+		DW1000.getData(data, LEN_DATA);
 		int messageType = detectMessageType(data);
 		if(messageType == POLL_ACK) {
 			//send FINAL to POLL recepient
 			transmitRange(myTag);
+			
 			_expectedMsgId = RANGE_REPORT;
 		}
 	}
 	// expect REPORT
 	else if(_expectedMsgId == RANGE_REPORT) {
 		int messageType = detectMessageType(data);
+		DW1000.getData(data, LEN_DATA);
 		if(messageType == RANGE_REPORT) {
 			//read and decode REPORT
 			//spit out data to ROS
