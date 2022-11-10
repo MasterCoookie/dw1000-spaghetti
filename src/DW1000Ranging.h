@@ -33,9 +33,9 @@
 
 // messages used in the ranging protocol
 #define POLL 0
-#define POLL_ACK 1
-#define RANGE 2
-#define RANGE_REPORT 3
+#define POLL_ACK 1 //RESPONSE
+#define RANGE 2 //FINAL
+#define RANGE_REPORT 3 //REPORT
 #define RANGE_FAILED 255
 #define BLINK 4
 #define RANGING_INIT 5

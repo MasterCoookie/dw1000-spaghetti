@@ -374,20 +374,49 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 
 void DW1000RangingClass::loop_tag() {
 	// expect ROS begin
+	char anchor_address[] = "82:17:5B:D5:A9:9A:E2:9C";
+	byte anchor_address_byte[8];	
+
+	DW1000.convertToByte(anchor_address, anchor_address_byte);
+
+
+	byte anchor_address_short_byte[2];
+	anchor_address_short_byte[0] = anchor_address_byte[0];
+	anchor_address_short_byte[1] = anchor_address_byte[1];
+
+
+
+	DW1000Device* myTag(anchor_address_byte, anchor_address_short_byte);
 		//prepare frame with self as sender and recepient as data red form ROS
+		
 		// send POLL with frames
+		transmitPoll(myTag);
+		_expectedMsgId = POLL_ACK;
 
 	// expect RESPONSE from POLL recepient
-		//send FINAL to POLL recepient
-
+	if(_expectedMsgId == POLL_ACK) {
+		int messageType = detectMessageType(data);
+		if(messageType == POLL_ACK) {
+			//send FINAL to POLL recepient
+			transmitRange(myTag);
+			_expectedMsgId = RANGE_REPORT;
+		}
+	}
 	// expect REPORT
-		//read and decode REPORT
-		//spit out data to ROS
+	else if(_expectedMsgId == RANGE_REPORT) {
+		int messageType = detectMessageType(data);
+		if(messageType == RANGE_REPORT) {
+			//read and decode REPORT
+			//spit out data to ROS
+		}
+	}
+		
 }
 
 void DW1000RangingClass::loop_anchor() {
 	//exepect POLL
 		//check POLL sender address
+
 		//save address as next FINAL recepient
 		//send RESPONSE
 
