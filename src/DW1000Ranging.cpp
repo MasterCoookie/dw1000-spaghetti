@@ -397,7 +397,9 @@ void DW1000RangingClass::loop_tag() {
 	if(_expectedMsgId == POLL_ACK) {
 		DW1000.getData(data, LEN_DATA);
 		int messageType = detectMessageType(data);
+		//TODO check recepient
 		if(messageType == POLL_ACK) {
+			DW1000.getReceiveTimestamp(myTag->timePollAckReceived);
 			//send FINAL to POLL recepient
 			transmitRange(myTag);
 			
@@ -408,9 +410,17 @@ void DW1000RangingClass::loop_tag() {
 	else if(_expectedMsgId == RANGE_REPORT) {
 		int messageType = detectMessageType(data);
 		DW1000.getData(data, LEN_DATA);
+		//TODO check recepient
 		if(messageType == RANGE_REPORT) {
 			//read and decode REPORT
+			float curRange;
+			memcpy(&curRange, data+1+SHORT_MAC_LEN, 4);
+			float curRXPower;
+			memcpy(&curRXPower, data+5+SHORT_MAC_LEN, 4);
+
+
 			//spit out data to ROS
+			//prepare for another round
 		}
 	}
 		
