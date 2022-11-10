@@ -373,25 +373,26 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 }
 
 void DW1000RangingClass::loop_tag() {
-	// expect begin
-		//prepare frame
-		// send POLL
+	// expect ROS begin
+		//prepare frame with self as sender and recepient as data red form ROS
+		// send POLL with frames
 
-	// expect response
-		//send final
+	// expect RESPONSE from POLL recepient
+		//send FINAL to POLL recepient
 
-	// expect report
-		//read raport
-		//spit out data
+	// expect REPORT
+		//read and decode REPORT
+		//spit out data to ROS
 }
 
 void DW1000RangingClass::loop_anchor() {
-	//exepect poll
-		//check address
-		//send response
+	//exepect POLL
+		//check POLL sender address
+		//save address as next FINAL recepient
+		//send RESPONSE
 
-	//expect final
-		//send report
+	//expect FINAL from POLL sender
+		//send REPORT to FINAL sender
 	
 }
 
