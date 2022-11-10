@@ -98,6 +98,8 @@ public:
 	//ranging functions
 	static int16_t detectMessageType(byte datas[]); // TODO check return type
 	static void loop();
+	static void loop_anchor();
+	static void loop_tag();
 	static void useRangeFilter(boolean enabled);
 	// Used for the smoothing algorithm (Exponential Moving Average). newValue must be >= 2. Default 15.
 	static void setRangeFilterValue(uint16_t newValue);

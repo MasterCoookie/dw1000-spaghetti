@@ -372,6 +372,29 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 	}
 }
 
+void DW1000RangingClass::loop_tag() {
+	// expect begin
+		//prepare frame
+		// send POLL
+
+	// expect response
+		//send final
+
+	// expect report
+		//read raport
+		//spit out data
+}
+
+void DW1000RangingClass::loop_anchor() {
+	//exepect poll
+		//check address
+		//send response
+
+	//expect final
+		//send report
+	
+}
+
 void DW1000RangingClass::loop() {
 	//we check if needed to reset !
 	checkForReset();
