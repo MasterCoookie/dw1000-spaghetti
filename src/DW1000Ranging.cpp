@@ -437,13 +437,16 @@ void DW1000RangingClass::loop_anchor() {
 	//TODO call when ready to recieve?
 	DW1000.getData(data, LEN_DATA);
 	int messageType = detectMessageType(data);
-	//TODO check recepient
+	
 
 	byte tag_address_short_byte[2];
 	byte tag_address_byte[8];	
 
 	_globalMac.decodeShortMACFrame(data, tag_address_short_byte);
 	_globalMac.decodeLongMACFrame(data, tag_address_byte);
+
+	//TODO check recepient
+	//get self address, compare with tag_address_byte
 
 	DW1000Device* myTag(tag_address_byte, tag_address_short_byte);
 
@@ -477,11 +480,7 @@ void DW1000RangingClass::loop_anchor() {
 		_expectedMsgId = POLL; //??
 
 
-	}
-
-	//expect FINAL from POLL sender
-		//send REPORT to FINAL sender
-	
+	}	
 }
 
 void DW1000RangingClass::loop() {
