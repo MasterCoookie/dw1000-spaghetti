@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cstring>
 #include <Arduino.h>
 #include <SPI.h>
 #include "DW1000Constants.h"
