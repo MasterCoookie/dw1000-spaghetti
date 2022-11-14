@@ -386,7 +386,7 @@ void DW1000RangingClass::loop_tag() {
 
 
 
-		DW1000Device* myAnchor(anchor_address_byte, anchor_address_short_byte);
+		DW1000Device* myAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
 
 		//prepare frame with self as sender and recepient as data red form ROS
 		
@@ -448,13 +448,13 @@ void DW1000RangingClass::loop_anchor() {
 	//TODO check recepient
 	//get self address, compare with tag_address_byte
 
-	DW1000Device* myTag(tag_address_byte, tag_address_short_byte);
+	DW1000Device* myTag = new DW1000Device(tag_address_byte, tag_address_short_byte);
 
 	//exepect POLL
 	if(messageType == POLL && _expectedMsgId == POLL) {
 		//save address as next FINAL recepient
 		//615
-		DW1000.getReceiveTimestamp(myDistantDevice->timePollReceived);
+		DW1000.getReceiveTimestamp(myTag->timePollReceived);
 		_expectedMsgId = RANGE;
 	} else if((messageType == RANGE && _expectedMsgId == RANGE)) {
 		DW1000.getReceiveTimestamp(myTag->timeRangeReceived);
@@ -562,6 +562,7 @@ void DW1000RangingClass::loop() {
 		//we read the datas from the modules:
 		// get message and parse
 		DW1000.getData(data, LEN_DATA);
+		visualizeDatas(data);
 		
 		int messageType = detectMessageType(data);
 		
