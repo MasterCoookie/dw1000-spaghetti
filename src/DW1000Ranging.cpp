@@ -372,9 +372,9 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 	}
 }
 
-void DW1000RangingClass::loop_tag() {
+void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// expect ROS begin
-		char anchor_address[] = "82:17:5B:D5:A9:9A:E2:9C";
+		
 		byte anchor_address_byte[8];	
 
 		DW1000.convertToByte(anchor_address, anchor_address_byte);
@@ -387,6 +387,7 @@ void DW1000RangingClass::loop_tag() {
 
 
 		DW1000Device* myAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
+		myAnchor->configureNetwork(anchor_address_short_byte[0]*256+anchor_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
 
 		//prepare frame with self as sender and recepient as data red form ROS
 		
@@ -399,6 +400,7 @@ void DW1000RangingClass::loop_tag() {
 	// expect RESPONSE from POLL recepient
 	if(_expectedMsgId == POLL_ACK) {
 		DW1000.getData(data, LEN_DATA);
+		DW1000.visualizeDatas(data);
 		int messageType = detectMessageType(data);
 
 		//TODO check recepient
@@ -417,6 +419,7 @@ void DW1000RangingClass::loop_tag() {
 	else if(_expectedMsgId == RANGE_REPORT) {
 		int messageType = detectMessageType(data);
 		DW1000.getData(data, LEN_DATA);
+		DW1000.visualizeDatas(data);
 		//TODO check recepient
 		if(messageType == RANGE_REPORT) {
 			//read and decode REPORT
@@ -436,51 +439,58 @@ void DW1000RangingClass::loop_tag() {
 void DW1000RangingClass::loop_anchor() {
 	//TODO call when ready to recieve?
 	DW1000.getData(data, LEN_DATA);
+	DW1000.visualizeDatas(data);
 	int messageType = detectMessageType(data);
 	
 
 	byte tag_address_short_byte[2];
+	byte destenation_address_short_byte[2];
 	byte tag_address_byte[8];	
 
 	_globalMac.decodeShortMACFrame(data, tag_address_short_byte);
 	_globalMac.decodeLongMACFrame(data, tag_address_byte);
 
+	_globalMac.decodeDestenationMACFrame(data, destenation_address_short_byte);
+
 	//TODO check recepient
-	//get self address, compare with tag_address_byte
+	if(destenation_address_short_byte[0] == _currentShortAddress[0] && destenation_address_short_byte[1] == _currentShortAddress[1]){
+		//get self address, compare with tag_address_byte
 
-	DW1000Device* myTag = new DW1000Device(tag_address_byte, tag_address_short_byte);
+		DW1000Device* myTag = new DW1000Device(tag_address_byte, tag_address_short_byte);
+		myAnchor->configureNetwork(tag_address_short_byte[0]*256+tag_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
 
-	//exepect POLL
-	if(messageType == POLL && _expectedMsgId == POLL) {
-		//save address as next FINAL recepient
-		//615
-		DW1000.getReceiveTimestamp(myTag->timePollReceived);
-		_expectedMsgId = RANGE;
-	} else if((messageType == RANGE && _expectedMsgId == RANGE)) {
-		DW1000.getReceiveTimestamp(myTag->timeRangeReceived);
-		
-		//TODO FRAME CALCULATIONS
-		myTag->timePollSent.setTimestamp(data+SHORT_MAC_LEN+4);
-		myTag->timePollAckReceived.setTimestamp(data+SHORT_MAC_LEN+9);
-		myTag->timeRangeSent.setTimestamp(data+SHORT_MAC_LEN+14);
+		//exepect POLL
+		if(messageType == POLL && _expectedMsgId == POLL) {
+			//save address as next FINAL recepient
+			//615
+			DW1000.getReceiveTimestamp(myTag->timePollReceived);
+			_expectedMsgId = RANGE;
+		} else if((messageType == RANGE && _expectedMsgId == RANGE)) {
+			DW1000.getReceiveTimestamp(myTag->timeRangeReceived);
+			
+			//TODO FRAME CALCULATIONS
+			myTag->timePollSent.setTimestamp(data+SHORT_MAC_LEN+4);
+			myTag->timePollAckReceived.setTimestamp(data+SHORT_MAC_LEN+9);
+			myTag->timeRangeSent.setTimestamp(data+SHORT_MAC_LEN+14);
 
-		DW1000Time myTOF;
-		computeRangeAsymmetric(myTag, &myTOF); 
-		float distance = myTOF.getAsMeters();
+			DW1000Time myTOF;
+			computeRangeAsymmetric(myTag, &myTOF); 
+			float distance = myTOF.getAsMeters();
 
-		myTag->setRXPower(DW1000.getReceivePower());
-		myTag->setRange(distance);
-		
-		myTag->setFPPower(DW1000.getFirstPathPower());
-		myTag->setQuality(DW1000.getReceiveQuality());
-		
-		//we send the range to TAG
-		transmitRangeReport(myTag);
+			myTag->setRXPower(DW1000.getReceivePower());
+			myTag->setRange(distance);
+			
+			myTag->setFPPower(DW1000.getFirstPathPower());
+			myTag->setQuality(DW1000.getReceiveQuality());
+			
+			//we send the range to TAG
+			transmitRangeReport(myTag);
 
-		_expectedMsgId = POLL; //??
+			_expectedMsgId = POLL; //??
+		}	
+	}
 
-
-	}	
+	
 }
 
 void DW1000RangingClass::loop() {

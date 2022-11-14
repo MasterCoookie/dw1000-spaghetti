@@ -124,6 +124,7 @@ void DW1000Mac::decodeBlinkFrame(byte frame[], byte address[], byte shortAddress
 	reverseArray(shortAddress, reverseShortAddress, 2);
 }
 
+//SENDER
 void DW1000Mac::decodeShortMACFrame(byte frame[], byte address[]) {
 	byte reverseAddress[2];
 	memcpy(reverseAddress, frame+7, 2);
@@ -131,6 +132,12 @@ void DW1000Mac::decodeShortMACFrame(byte frame[], byte address[]) {
 	//we grab the destination address for the mac frame
 	//byte destinationAddress[2];
 	//memcpy(destinationAddress, frame+5, 2);
+}
+
+void DW1000Mac::decodeDestenationMACFrame(byte frame[], byte address[]) {
+	we grab the destination address for the mac frame
+	byte destinationAddress[2];
+	memcpy(destinationAddress, frame+5, 2);
 }
 
 void DW1000Mac::decodeLongMACFrame(byte frame[], byte address[]) {
