@@ -64,7 +64,7 @@
 
 //debug mode
 #ifndef DEBUG
-#define DEBUG false
+#define DEBUG true
 #endif
 
 
