@@ -174,7 +174,7 @@ private:
 	//17 bytes in SRAM
 	static char  _bias_PRF_64[17]; // TODO remove or use
 
-	DW1000Device* myAnchor;
+	DW1000Device* myStaticAnchor;
 	
 	
 	//methods

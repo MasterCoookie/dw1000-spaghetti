@@ -386,7 +386,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	
 
 	// expect RESPONSE from POLL recepient
-	if(_expectedMsgId == POLL_ACK) {
+	if(_expectedMsgId == POLL_ACK && _receivedAck == true) {
 		DW1000.getData(data, LEN_DATA);
 		visualizeDatas(data);
 		int messageType = detectMessageType(data);
@@ -396,15 +396,15 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 		//compare with our address
 
 		if(messageType == POLL_ACK) {
-			DW1000.getReceiveTimestamp(myAnchor->timePollAckReceived);
+			DW1000.getReceiveTimestamp(myStaticAnchor->timePollAckReceived);
 			//send FINAL to POLL recepient
-			transmitRange(this->myAnchor);
+			transmitRange(myStaticAnchor);
 			
 			_expectedMsgId = RANGE_REPORT;
 		}
 	}
 	// expect REPORT
-	else if(_expectedMsgId == RANGE_REPORT) {
+	else if(_expectedMsgId == RANGE_REPORT && _receivedAck == true) {
 		int messageType = detectMessageType(data);
 		DW1000.getData(data, LEN_DATA);
 		visualizeDatas(data);
@@ -432,9 +432,9 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 
 
 
-		this->myAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
+		myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
 
-		transmitPoll(myAnchor);
+		transmitPoll(myStaticAnchor);
 		_expectedMsgId = POLL_ACK;
 	}		
 }
