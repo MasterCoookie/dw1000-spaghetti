@@ -462,13 +462,23 @@ void DW1000RangingClass::loop_anchor() {
 		//exepect POLL
 		if(messageType == POLL && _expectedMsgId == POLL) {
 			//save address as next FINAL recepient
-			//615
+
 			DW1000.getReceiveTimestamp(myTag->timePollReceived);
 			_expectedMsgId = RANGE;
+
+			//we grab the replytime wich is for us
+			uint16_t replyTime;
+			memcpy(&replyTime, data+SHORT_MAC_LEN+4, 2);
+			//we configure our replyTime;
+			_replyDelayTimeUS = replyTime;
+
+			DW1000.getReceiveTimestamp(myTag->timePollReceived);
+			transmitPollAck(myTag);
+			
+
 		} else if((messageType == RANGE && _expectedMsgId == RANGE)) {
 			DW1000.getReceiveTimestamp(myTag->timeRangeReceived);
 			
-			//TODO FRAME CALCULATIONS
 			myTag->timePollSent.setTimestamp(data+SHORT_MAC_LEN+4);
 			myTag->timePollAckReceived.setTimestamp(data+SHORT_MAC_LEN+9);
 			myTag->timeRangeSent.setTimestamp(data+SHORT_MAC_LEN+14);
