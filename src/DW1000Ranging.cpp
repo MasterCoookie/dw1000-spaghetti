@@ -375,27 +375,15 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// expect ROS begin
 		
-		byte anchor_address_byte[8];	
-
-		DW1000.convertToByte(anchor_address, anchor_address_byte);
-
-
-		byte anchor_address_short_byte[2];
-		anchor_address_short_byte[0] = anchor_address_byte[0];
-		anchor_address_short_byte[1] = anchor_address_byte[1];
-
-
-
-		DW1000Device* myAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
+		
 		// myAnchor->configureNetwork(anchor_address_short_byte[0]*256+anchor_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
 
 		//prepare frame with self as sender and recepient as data red form ROS
 		
-		// send POLL with frames
-		transmitPoll(myAnchor);
-		_expectedMsgId = POLL_ACK;
+		
 
 	//expect ROS end
+	
 
 	// expect RESPONSE from POLL recepient
 	if(_expectedMsgId == POLL_ACK) {
@@ -410,7 +398,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 		if(messageType == POLL_ACK) {
 			DW1000.getReceiveTimestamp(myAnchor->timePollAckReceived);
 			//send FINAL to POLL recepient
-			transmitRange(myAnchor);
+			transmitRange(this->myAnchor);
 			
 			_expectedMsgId = RANGE_REPORT;
 		}
@@ -432,8 +420,23 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 			//spit out data to ROS
 			//prepare for another round
 		}
-	}
-		
+	} else {
+		byte anchor_address_byte[8];	
+
+		DW1000.convertToByte(anchor_address, anchor_address_byte);
+
+
+		byte anchor_address_short_byte[2];
+		anchor_address_short_byte[0] = anchor_address_byte[0];
+		anchor_address_short_byte[1] = anchor_address_byte[1];
+
+
+
+		this->myAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
+
+		transmitPoll(myAnchor);
+		_expectedMsgId = POLL_ACK;
+	}		
 }
 
 void DW1000RangingClass::loop_anchor() {

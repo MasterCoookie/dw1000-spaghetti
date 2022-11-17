@@ -173,6 +173,8 @@ private:
 	static int16_t _bias_PRF_16[17]; // TODO remove or use
 	//17 bytes in SRAM
 	static char  _bias_PRF_64[17]; // TODO remove or use
+
+	DW1000Device* myAnchor;
 	
 	
 	//methods
