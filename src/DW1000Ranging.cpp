@@ -387,7 +387,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 
 
 		DW1000Device* myAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
-		myAnchor->configureNetwork(anchor_address_short_byte[0]*256+anchor_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
+		// myAnchor->configureNetwork(anchor_address_short_byte[0]*256+anchor_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
 
 		//prepare frame with self as sender and recepient as data red form ROS
 		
@@ -400,7 +400,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// expect RESPONSE from POLL recepient
 	if(_expectedMsgId == POLL_ACK) {
 		DW1000.getData(data, LEN_DATA);
-		DW1000.visualizeDatas(data);
+		visualizeDatas(data);
 		int messageType = detectMessageType(data);
 
 		//TODO check recepient
@@ -419,7 +419,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	else if(_expectedMsgId == RANGE_REPORT) {
 		int messageType = detectMessageType(data);
 		DW1000.getData(data, LEN_DATA);
-		DW1000.visualizeDatas(data);
+		visualizeDatas(data);
 		//TODO check recepient
 		if(messageType == RANGE_REPORT) {
 			//read and decode REPORT
@@ -439,7 +439,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 void DW1000RangingClass::loop_anchor() {
 	//TODO call when ready to recieve?
 	DW1000.getData(data, LEN_DATA);
-	DW1000.visualizeDatas(data);
+	visualizeDatas(data);
 	int messageType = detectMessageType(data);
 	
 
@@ -457,7 +457,7 @@ void DW1000RangingClass::loop_anchor() {
 		//get self address, compare with tag_address_byte
 
 		DW1000Device* myTag = new DW1000Device(tag_address_byte, tag_address_short_byte);
-		myAnchor->configureNetwork(tag_address_short_byte[0]*256+tag_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
+		//myTag->configureNetwork(tag_address_short_byte[0]*256+tag_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
 
 		//exepect POLL
 		if(messageType == POLL && _expectedMsgId == POLL) {

@@ -135,7 +135,7 @@ void DW1000Mac::decodeShortMACFrame(byte frame[], byte address[]) {
 }
 
 void DW1000Mac::decodeDestenationMACFrame(byte frame[], byte address[]) {
-	we grab the destination address for the mac frame
+	//we grab the destination address for the mac frame
 	byte destinationAddress[2];
 	memcpy(destinationAddress, frame+5, 2);
 }
