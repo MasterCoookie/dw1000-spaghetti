@@ -591,6 +591,7 @@ void DW1000RangingClass::loop() {
 			byte address[8];
 			byte shortAddress[2];
 			_globalMac.decodeBlinkFrame(data, address, shortAddress);
+			displayFullAddress(address);
 			//we crate a new device with th tag
 			DW1000Device myTag(address, shortAddress);
 			
@@ -1105,6 +1106,13 @@ void DW1000RangingClass::visualizeDatas(byte datas[]) {
 	char string[60];
 	sprintf(string, "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
 					datas[0], datas[1], datas[2], datas[3], datas[4], datas[5], datas[6], datas[7], datas[8], datas[9], datas[10], datas[11], datas[12], datas[13], datas[14], datas[15]);
+	Serial.println(string);
+}
+
+void DW1000RangingClass::displayFullAddress(byte datas[]) {	
+	char string[60];
+	sprintf(string, "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
+					datas[0], datas[1], datas[2], datas[3], datas[4], datas[5], datas[6], datas[7]);
 	Serial.println(string);
 }
 

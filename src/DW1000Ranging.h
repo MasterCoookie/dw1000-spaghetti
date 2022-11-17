@@ -120,6 +120,7 @@ public:
 	
 	//FOR DEBUGGING
 	static void visualizeDatas(byte datas[]);
+	static void displayFullAddress(byte address[]);
 
 
 private:
