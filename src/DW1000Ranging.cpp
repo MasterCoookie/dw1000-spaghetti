@@ -455,9 +455,15 @@ void DW1000RangingClass::loop_anchor() {
 
 		_globalMac.decodeDestenationMACFrame(data, destenation_address_short_byte);
 
+		Serial.print("Own address: ");
+		displayShortAddress(_currentShortAddress);
+		Serial.print("Decoded address: ");
+		displayShortAddress(destenation_address_short_byte);
+
 		//TODO check recepient
 		if(destenation_address_short_byte[0] == _currentShortAddress[0] && destenation_address_short_byte[1] == _currentShortAddress[1]){
 			//get self address, compare with tag_address_byte
+			Serial.println("self address matched!");
 
 			DW1000Device* myTag = new DW1000Device(tag_address_byte, tag_address_short_byte);
 			//myTag->configureNetwork(tag_address_short_byte[0]*256+tag_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
@@ -1115,6 +1121,13 @@ void DW1000RangingClass::displayFullAddress(byte datas[]) {
 	char string[60];
 	sprintf(string, "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
 					datas[0], datas[1], datas[2], datas[3], datas[4], datas[5], datas[6], datas[7]);
+	Serial.println(string);
+}
+
+void DW1000RangingClass::displayShortAddress(byte datas[]) {	
+	char string[60];
+	sprintf(string, "%02X:%02X",
+					datas[0], datas[1]);
 	Serial.println(string);
 }
 
