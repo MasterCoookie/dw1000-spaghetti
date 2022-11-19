@@ -87,6 +87,7 @@ public:
 	//setters
 	static void setReplyTime(uint16_t replyDelayTimeUs);
 	static void setResetPeriod(uint32_t resetPeriod);
+	static void setSentAck(bool sent);
 	
 	//getters
 	static byte* getCurrentAddress() { return _currentAddress; };

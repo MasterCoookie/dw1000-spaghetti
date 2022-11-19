@@ -308,6 +308,8 @@ void DW1000RangingClass::setReplyTime(uint16_t replyDelayTimeUs) { _replyDelayTi
 
 void DW1000RangingClass::setResetPeriod(uint32_t resetPeriod) { _resetPeriod = resetPeriod; }
 
+void DW1000RangingClass::setSentAck(bool sent) { _sentAck = sent; }
+
 
 DW1000Device* DW1000RangingClass::searchDistantDevice(byte shortAddress[]) {
 	//we compare the 2 bytes address with the others
@@ -421,21 +423,25 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 			//prepare for another round
 		}
 	} else {
-		byte anchor_address_byte[8];
-
-		DW1000.convertToByte(anchor_address, anchor_address_byte);
-
-
-		byte anchor_address_short_byte[2];
-		anchor_address_short_byte[0] = anchor_address_byte[0];
-		anchor_address_short_byte[1] = anchor_address_byte[1];
+		if(_sentAck == true) {
+			_sentAck = false;
+			byte anchor_address_byte[8];
+			
+			DW1000.convertToByte(anchor_address, anchor_address_byte);
 
 
+			byte anchor_address_short_byte[2];
+			anchor_address_short_byte[0] = anchor_address_byte[0];
+			anchor_address_short_byte[1] = anchor_address_byte[1];
 
-		myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
 
-		transmitPoll(myStaticAnchor);
-		// _expectedMsgId = POLL_ACK;
+
+			myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
+
+			transmitPoll(myStaticAnchor);
+			// _expectedMsgId = POLL_ACK;
+		}
+		
 	}		
 }
 
