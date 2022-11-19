@@ -396,9 +396,9 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 		//compare with our address
 
 		if(messageType == POLL_ACK) {
-			DW1000.getReceiveTimestamp(myStaticAnchor->timePollAckReceived);
+			// DW1000.getReceiveTimestamp(myStaticAnchor->timePollAckReceived);
 			//send FINAL to POLL recepient
-			transmitRange(myStaticAnchor);
+			// transmitRange(myStaticAnchor);
 			
 			_expectedMsgId = RANGE_REPORT;
 		}
@@ -435,75 +435,74 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 		myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
 
 		transmitPoll(myStaticAnchor);
-		_expectedMsgId = POLL_ACK;
+		// _expectedMsgId = POLL_ACK;
 	}		
 }
 
 void DW1000RangingClass::loop_anchor() {
-	//TODO call when ready to recieve?
-	DW1000.getData(data, LEN_DATA);
-	visualizeDatas(data);
-	int messageType = detectMessageType(data);
-	
+	if(_receivedAck) {
+		DW1000.getData(data, LEN_DATA);
+		visualizeDatas(data);
+		int messageType = detectMessageType(data);
+		
 
-	byte tag_address_short_byte[2];
-	byte destenation_address_short_byte[2];
-	byte tag_address_byte[8];	
+		byte tag_address_short_byte[2];
+		byte destenation_address_short_byte[2];
+		byte tag_address_byte[8];	
 
-	_globalMac.decodeShortMACFrame(data, tag_address_short_byte);
-	_globalMac.decodeLongMACFrame(data, tag_address_byte);
+		_globalMac.decodeShortMACFrame(data, tag_address_short_byte);
+		_globalMac.decodeLongMACFrame(data, tag_address_byte);
 
-	_globalMac.decodeDestenationMACFrame(data, destenation_address_short_byte);
+		_globalMac.decodeDestenationMACFrame(data, destenation_address_short_byte);
 
-	//TODO check recepient
-	if(destenation_address_short_byte[0] == _currentShortAddress[0] && destenation_address_short_byte[1] == _currentShortAddress[1]){
-		//get self address, compare with tag_address_byte
+		//TODO check recepient
+		if(destenation_address_short_byte[0] == _currentShortAddress[0] && destenation_address_short_byte[1] == _currentShortAddress[1]){
+			//get self address, compare with tag_address_byte
 
-		DW1000Device* myTag = new DW1000Device(tag_address_byte, tag_address_short_byte);
-		//myTag->configureNetwork(tag_address_short_byte[0]*256+tag_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
+			DW1000Device* myTag = new DW1000Device(tag_address_byte, tag_address_short_byte);
+			//myTag->configureNetwork(tag_address_short_byte[0]*256+tag_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
 
-		//exepect POLL
-		if(messageType == POLL && _expectedMsgId == POLL) {
-			//save address as next FINAL recepient
+			//exepect POLL
+			if(messageType == POLL && _expectedMsgId == POLL) {
+				//save address as next FINAL recepient
 
-			DW1000.getReceiveTimestamp(myTag->timePollReceived);
-			_expectedMsgId = RANGE;
+				DW1000.getReceiveTimestamp(myTag->timePollReceived);
+				_expectedMsgId = RANGE;
 
-			//we grab the replytime wich is for us
-			uint16_t replyTime;
-			memcpy(&replyTime, data+SHORT_MAC_LEN+4, 2);
-			//we configure our replyTime;
-			_replyDelayTimeUS = replyTime;
+				//we grab the replytime wich is for us
+				uint16_t replyTime;
+				memcpy(&replyTime, data+SHORT_MAC_LEN+4, 2);
+				//we configure our replyTime;
+				_replyDelayTimeUS = replyTime;
 
-			DW1000.getReceiveTimestamp(myTag->timePollReceived);
-			transmitPollAck(myTag);
-			
+				DW1000.getReceiveTimestamp(myTag->timePollReceived);
+				transmitPollAck(myTag);
+				
 
-		} else if((messageType == RANGE && _expectedMsgId == RANGE)) {
-			DW1000.getReceiveTimestamp(myTag->timeRangeReceived);
-			
-			myTag->timePollSent.setTimestamp(data+SHORT_MAC_LEN+4);
-			myTag->timePollAckReceived.setTimestamp(data+SHORT_MAC_LEN+9);
-			myTag->timeRangeSent.setTimestamp(data+SHORT_MAC_LEN+14);
+			} else if((messageType == RANGE && _expectedMsgId == RANGE)) {
+				DW1000.getReceiveTimestamp(myTag->timeRangeReceived);
+				
+				myTag->timePollSent.setTimestamp(data+SHORT_MAC_LEN+4);
+				myTag->timePollAckReceived.setTimestamp(data+SHORT_MAC_LEN+9);
+				myTag->timeRangeSent.setTimestamp(data+SHORT_MAC_LEN+14);
 
-			DW1000Time myTOF;
-			computeRangeAsymmetric(myTag, &myTOF); 
-			float distance = myTOF.getAsMeters();
+				DW1000Time myTOF;
+				computeRangeAsymmetric(myTag, &myTOF); 
+				float distance = myTOF.getAsMeters();
 
-			myTag->setRXPower(DW1000.getReceivePower());
-			myTag->setRange(distance);
-			
-			myTag->setFPPower(DW1000.getFirstPathPower());
-			myTag->setQuality(DW1000.getReceiveQuality());
-			
-			//we send the range to TAG
-			transmitRangeReport(myTag);
+				myTag->setRXPower(DW1000.getReceivePower());
+				myTag->setRange(distance);
+				
+				myTag->setFPPower(DW1000.getFirstPathPower());
+				myTag->setQuality(DW1000.getReceiveQuality());
+				
+				//we send the range to TAG
+				transmitRangeReport(myTag);
 
-			_expectedMsgId = POLL; //??
-		}	
+				_expectedMsgId = POLL; //??
+			}	
+		}
 	}
-
-	
 }
 
 void DW1000RangingClass::loop() {

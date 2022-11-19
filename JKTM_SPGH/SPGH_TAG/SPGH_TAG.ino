@@ -31,8 +31,8 @@ void setup()
 
 void loop()
 {
-    // DW1000Ranging.loop_tag("86:17:5B:D5:A9:9A:E2:9C");
-    DW1000Ranging.loop();
+    DW1000Ranging.loop_tag("86:17:5B:D5:A9:9A:E2:9C");
+    // DW1000Ranging.loop();
 }
 
 void newRange()
