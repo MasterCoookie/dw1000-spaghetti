@@ -421,7 +421,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 			//prepare for another round
 		}
 	} else {
-		byte anchor_address_byte[8];	
+		byte anchor_address_byte[8];
 
 		DW1000.convertToByte(anchor_address, anchor_address_byte);
 
@@ -441,6 +441,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 
 void DW1000RangingClass::loop_anchor() {
 	if(_receivedAck) {
+		_receivedAck = false;
 		DW1000.getData(data, LEN_DATA);
 		visualizeDatas(data);
 		int messageType = detectMessageType(data);
