@@ -29,11 +29,12 @@ void setup()
     DW1000Ranging.startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
     //to make it run first time
     DW1000Ranging.setSentAck(true);
+    DW1000Ranging.beginProtocol();
 }
 
 void loop()
 {
-    DW1000Ranging.loop_tag("AA:BC:5B:D5:A9:9A:E2:9C");
+    DW1000Ranging.loop_tag("AA:BB:5B:D5:A9:9A:E2:9C");
     // DW1000Ranging.loop();
 }
 

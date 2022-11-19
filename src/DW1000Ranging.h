@@ -123,7 +123,10 @@ public:
 	static void visualizeDatas(byte datas[]);
 	static void displayFullAddress(byte address[]);
 	static void displayShortAddress(byte datas[]);
+	static void beginProtocol();
 
+
+	//own Methods
 
 private:
 	//other devices in the network
@@ -177,6 +180,8 @@ private:
 	static char  _bias_PRF_64[17]; // TODO remove or use
 
 	inline static DW1000Device* myStaticAnchor;
+	inline static DW1000Device* myStaticTag;
+	inline static bool initProtocol;
 	
 	
 	//methods
