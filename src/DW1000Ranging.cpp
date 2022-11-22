@@ -501,10 +501,10 @@ void DW1000RangingClass::loop_anchor() {
 
 		_globalMac.decodeDestenationMACFrame(data, destenation_address_short_byte);
 
-		Serial.print("Own address: ");
-		displayShortAddress(_currentShortAddress);
-		Serial.print("Decoded address: ");
-		displayShortAddress(destenation_address_short_byte);
+		// Serial.print("Own address: ");
+		// displayShortAddress(_currentShortAddress);
+		// Serial.print("Decoded address: ");
+		// displayShortAddress(destenation_address_short_byte);
 
 		//TODO check recepient
 		if(destenation_address_short_byte[0] == _currentShortAddress[0] && destenation_address_short_byte[1] == _currentShortAddress[1]){
