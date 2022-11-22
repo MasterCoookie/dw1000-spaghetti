@@ -179,6 +179,7 @@ private:
 	//17 bytes in SRAM
 	static char  _bias_PRF_64[17]; // TODO remove or use
 
+	//our things
 	inline static DW1000Device* myStaticAnchor;
 	inline static DW1000Device* myStaticTag;
 	inline static bool initProtocol;

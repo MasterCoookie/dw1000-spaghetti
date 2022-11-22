@@ -447,6 +447,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// expect REPORT
 	else if(_expectedMsgId == RANGE_REPORT && _receivedAck == true) {
 		_receivedAck = false;
+		//detect data type 
 		int messageType = data[SHORT_MAC_LEN];
 		DW1000.getData(data, LEN_DATA);
 		Serial.println("POLL_ACK expected, data received: ");
