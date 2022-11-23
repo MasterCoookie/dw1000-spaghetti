@@ -379,7 +379,7 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 
 void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// expect ROS begin
-	if(_sentAck == true) {
+	if(_sentAck) {
 			_sentAck = false;
 			if(DW1000RangingClass::initProtocol) {
 				DW1000RangingClass::initProtocol = false;
@@ -477,11 +477,18 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 				float curRXPower;
 				memcpy(&curRXPower, data+5+SHORT_MAC_LEN, 4);
 
+				curRange/=100.0f;
+				Serial.print("Range: ");
+				Serial.println(curRange);
+				curRXPower/=100.0f;
+				Serial.print("Power: ");
+				Serial.println(curRXPower);
+
 
 				//spit out data to ROS
-				if(_handleNewRange != 0) {
+				/*if(_handleNewRange != 0) {
 					(*_handleNewRange)();
-				}
+				}*/
 				//prepare for another round
 			}
 		}
@@ -588,6 +595,9 @@ void DW1000RangingClass::loop_anchor() {
 
 				_expectedMsgId = POLL; //??
 			}	
+		}
+		else {
+			return;
 		}
 	}
 }
