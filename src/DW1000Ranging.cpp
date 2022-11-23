@@ -431,8 +431,8 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 			_receivedAck = false;
 			DW1000.getData(data, LEN_DATA);
 			if(DEBUG) {
-			Serial.println("POLL_ACK expected, data received: ");
-			visualizeDatas(data);
+				Serial.println("POLL_ACK expected, data received: ");
+				visualizeDatas(data);
 			}
 			int messageType = detectMessageType(data);
 
@@ -442,7 +442,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 
 			if(messageType == POLL_ACK) {
 				if(DEBUG) {
-				Serial.println("POLL_ACK RECIEVED");
+					Serial.println("POLL_ACK RECIEVED");
 				}
 				DW1000.getReceiveTimestamp(myStaticAnchor->timePollAckReceived);
 				//send FINAL to POLL recepient
@@ -450,7 +450,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 				
 				_expectedMsgId = RANGE_REPORT;
 				if(DEBUG) {
-				Serial.println("RANGE SENT");
+					Serial.println("RANGE SENT");
 				}
 			}
 		}
@@ -461,15 +461,15 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 			DW1000.getData(data, LEN_DATA);
 			int messageType = detectMessageType(data);
 			if(DEBUG) {
-			Serial.println("POLL_ACK expected, data received: ");
-			visualizeDatas(data);
-			Serial.println(messageType);
+				Serial.println("POLL_ACK expected, data received: ");
+				visualizeDatas(data);
+				Serial.println(messageType);
 			}
 			//TODO check recepient
 			
 			if(messageType == RANGE_REPORT) {
 				if(DEBUG) {
-				Serial.println("RANGE_REPORT RECIEVED");
+					Serial.println("RANGE_REPORT RECIEVED");
 				}
 				//read and decode REPORT
 				float curRange;
@@ -504,7 +504,6 @@ void DW1000RangingClass::loop_anchor() {
 		}
 		int messageType = detectMessageType(data);
 		if(messageType == POLL_ACK) {
-			
 			if (myStaticTag) {
 				DW1000.getTransmitTimestamp(myStaticTag->timePollAckSent);
 			}
@@ -515,7 +514,7 @@ void DW1000RangingClass::loop_anchor() {
 		_receivedAck = false;
 		DW1000.getData(data, LEN_DATA);
 		if(DEBUG) {
-		visualizeDatas(data);
+			visualizeDatas(data);
 		}
 		int messageType = detectMessageType(data);
 		
@@ -538,7 +537,7 @@ void DW1000RangingClass::loop_anchor() {
 		if(destenation_address_short_byte[0] == _currentShortAddress[0] && destenation_address_short_byte[1] == _currentShortAddress[1]){
 			//get self address, compare with tag_address_byte
 			if(DEBUG) {
-			Serial.println("self address matched!");
+				Serial.println("self address matched!");
 			}
 
 			
@@ -564,12 +563,12 @@ void DW1000RangingClass::loop_anchor() {
 				DW1000.getReceiveTimestamp(myStaticTag->timePollReceived);
 				transmitPollAck(myStaticTag);
 				if(DEBUG) {
-				Serial.println("Sending POLL_ACK");
+					Serial.println("Sending POLL_ACK");
 				}
 
 			} else if((messageType == RANGE && _expectedMsgId == RANGE)) {
 				if(DEBUG) {
-				Serial.println("RANGE RECIEVED");
+					Serial.println("RANGE RECIEVED");
 				}
 				DW1000.getReceiveTimestamp(myStaticTag->timeRangeReceived);
 				
@@ -590,7 +589,7 @@ void DW1000RangingClass::loop_anchor() {
 				//we send the range to TAG
 				transmitRangeReport(myStaticTag);
 				if(DEBUG) {
-				Serial.println("RANGE_REPORT SENT");
+					Serial.println("RANGE_REPORT SENT");
 				}
 
 				_expectedMsgId = POLL; //??
