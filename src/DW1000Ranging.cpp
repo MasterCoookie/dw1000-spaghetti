@@ -526,11 +526,11 @@ void DW1000RangingClass::loop_anchor() {
 		}
 		
 
-		byte tag_address_short_byte[2];
+		
 		byte destenation_address_short_byte[2];
 		// byte tag_address_byte[8];	
 
-		_globalMac.decodeShortMACFrame(data, tag_address_short_byte);
+		
 		// _globalMac.decodeLongMACFrame(data, tag_address_byte);
 
 		_globalMac.decodeDestenationMACFrame(data, destenation_address_short_byte);
@@ -553,8 +553,10 @@ void DW1000RangingClass::loop_anchor() {
 			//exepect POLL
 			if(messageType == POLL) {
 				if(DEBUG) {
-				Serial.println("POLL received");
+					Serial.println("POLL received");
 				}
+				byte tag_address_short_byte[2];
+				_globalMac.decodeShortMACFrame(data, tag_address_short_byte);
 				//save address as next FINAL recepient
 				myStaticTag = new DW1000Device(tag_address_short_byte, true);
 
