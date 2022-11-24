@@ -571,7 +571,7 @@ void DW1000RangingClass::loop_anchor() {
 
 				//TMP
 				// memcpy(&replyTime, data+SHORT_MAC_LEN+4, 2);
-				replyTime = DEFAULT_REPLY_DELAY_TIME;
+				replyTime = myStaticTag->timePollReceived + DEFAULT_REPLY_DELAY_TIME;
 
 				//we configure our replyTime;
 				Serial.print("Reply time: ");
