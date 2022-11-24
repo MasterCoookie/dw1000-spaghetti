@@ -519,7 +519,7 @@ void DW1000RangingClass::loop_anchor() {
 
 		int messageType = detectMessageType(data);
 		if(messageType != _expectedMsgId) {
-			if(debug) {
+			if(DEBUG) {
 				Serial.println("Unexpected msg type!");
 			}
 			return;
