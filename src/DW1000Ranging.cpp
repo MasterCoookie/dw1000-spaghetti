@@ -395,7 +395,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 
 
 				myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
-
+				myStaticAnchor->setReplyTime(DEFAULT_REPLY_DELAY_TIME);
 				transmitPoll(myStaticAnchor);
 				_expectedMsgId = POLL_ACK;
 			} else {
@@ -559,6 +559,7 @@ void DW1000RangingClass::loop_anchor() {
 				_globalMac.decodeShortMACFrame(data, tag_address_short_byte);
 				//save address as next FINAL recepient
 				myStaticTag = new DW1000Device(tag_address_short_byte, true);
+				myStaticTag->setReplyTime(DEFAULT_REPLY_DELAY_TIME);
 
 				DW1000.getReceiveTimestamp(myStaticTag->timePollReceived);
 				_expectedMsgId = RANGE;
@@ -598,7 +599,7 @@ void DW1000RangingClass::loop_anchor() {
 				//we send the range to TAG
 				transmitRangeReport(myStaticTag);
 				if(DEBUG) {
-					Serial.println("RANGE_REPORT SENT");
+					Serial.println("RANGE_REPORT SENDING");
 				}
 
 				_expectedMsgId = POLL; //??
