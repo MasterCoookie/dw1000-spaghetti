@@ -569,8 +569,8 @@ void DW1000RangingClass::loop_anchor() {
 				uint16_t replyTime;
 
 				//TMP
-				memcpy(&replyTime, data+SHORT_MAC_LEN+2, 2);
-				// replyTime = myStaticTag->timePollReceived + DEFAULT_REPLY_DELAY_TIME;
+				// memcpy(&replyTime, data+SHORT_MAC_LEN+2, 2);
+				replyTime = DEFAULT_REPLY_DELAY_TIME;
 
 				//we configure our replyTime;
 				Serial.print("Reply time: ");
@@ -1206,23 +1206,23 @@ void DW1000RangingClass::computeRangeAsymmetric(DW1000Device* myDistantDevice, D
 	DW1000Time reply2 = (myDistantDevice->timeRangeSent-myDistantDevice->timePollAckReceived).wrap();
 	
 	myTOF->setTimestamp((round1*round2-reply1*reply2)/(round1+round2+reply1+reply2));
-	/*
-	Serial.print("timePollAckReceived ");myDistantDevice->timePollAckReceived.print();
-	Serial.print("timePollSent ");myDistantDevice->timePollSent.print();
-	Serial.print("round1 "); Serial.println((long)round1.getTimestamp());
-	
-	Serial.print("timePollAckSent ");myDistantDevice->timePollAckSent.print();
-	Serial.print("timePollReceived ");myDistantDevice->timePollReceived.print();
-	Serial.print("reply1 "); Serial.println((long)reply1.getTimestamp());
-	
-	Serial.print("timeRangeReceived ");myDistantDevice->timeRangeReceived.print();
-	Serial.print("timePollAckSent ");myDistantDevice->timePollAckSent.print();
-	Serial.print("round2 "); Serial.println((long)round2.getTimestamp());
-	
-	Serial.print("timeRangeSent ");myDistantDevice->timeRangeSent.print();
-	Serial.print("timePollAckReceived ");myDistantDevice->timePollAckReceived.print();
-	Serial.print("reply2 "); Serial.println((long)reply2.getTimestamp());
-	 */
+	if(DEBUG) {
+		Serial.print("timePollAckReceived ");myDistantDevice->timePollAckReceived.print();
+		Serial.print("timePollSent ");myDistantDevice->timePollSent.print();
+		Serial.print("round1 "); Serial.println((long)round1.getTimestamp());
+		
+		Serial.print("timePollAckSent ");myDistantDevice->timePollAckSent.print();
+		Serial.print("timePollReceived ");myDistantDevice->timePollReceived.print();
+		Serial.print("reply1 "); Serial.println((long)reply1.getTimestamp());
+		
+		Serial.print("timeRangeReceived ");myDistantDevice->timeRangeReceived.print();
+		Serial.print("timePollAckSent ");myDistantDevice->timePollAckSent.print();
+		Serial.print("round2 "); Serial.println((long)round2.getTimestamp());
+		
+		Serial.print("timeRangeSent ");myDistantDevice->timeRangeSent.print();
+		Serial.print("timePollAckReceived ");myDistantDevice->timePollAckReceived.print();
+		Serial.print("reply2 "); Serial.println((long)reply2.getTimestamp());
+	}
 }
 
 
