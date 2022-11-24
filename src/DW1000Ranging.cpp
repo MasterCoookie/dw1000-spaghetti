@@ -569,7 +569,7 @@ void DW1000RangingClass::loop_anchor() {
 				uint16_t replyTime;
 
 				//TMP
-				memcpy(&replyTime, data+SHORT_MAC_LEN+4, 2);
+				memcpy(&replyTime, data+SHORT_MAC_LEN+2, 2);
 				// replyTime = myStaticTag->timePollReceived + DEFAULT_REPLY_DELAY_TIME;
 
 				//we configure our replyTime;
