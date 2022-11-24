@@ -380,6 +380,8 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// expect ROS begin
 	if(_sentAck) {
+			Serial.print("Reply time:");
+			Serial.println(_replyDelayTimeUS);
 			_sentAck = false;
 			if(DW1000RangingClass::initProtocol) {
 				DW1000RangingClass::initProtocol = false;
@@ -566,7 +568,11 @@ void DW1000RangingClass::loop_anchor() {
 
 				//we grab the replytime wich is for us
 				uint16_t replyTime;
-				memcpy(&replyTime, data+SHORT_MAC_LEN+4, 2);
+
+				//TMP
+				// memcpy(&replyTime, data+SHORT_MAC_LEN+4, 2);
+				replyTime = DEFAULT_REPLY_DELAY_TIME;
+
 				//we configure our replyTime;
 				Serial.print("Reply time: ");
 				Serial.println(replyTime);
