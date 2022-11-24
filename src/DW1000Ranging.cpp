@@ -403,7 +403,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 			} else {
 				if(DEBUG) {
 				Serial.println("Data sent:");
-				visualizeDatas(data);
+					visualizeDatas(data);
 				}
 				int messageType = detectMessageType(data);
 
@@ -561,17 +561,16 @@ void DW1000RangingClass::loop_anchor() {
 				_globalMac.decodeShortMACFrame(data, tag_address_short_byte);
 				//save address as next FINAL recepient
 				myStaticTag = new DW1000Device(tag_address_short_byte, true);
-				myStaticTag->setReplyTime(DEFAULT_REPLY_DELAY_TIME);
+				// myStaticTag->setReplyTime(DEFAULT_REPLY_DELAY_TIME);
 
-				DW1000.getReceiveTimestamp(myStaticTag->timePollReceived);
 				_expectedMsgId = RANGE;
 
 				//we grab the replytime wich is for us
 				uint16_t replyTime;
 
 				//TMP
-				// memcpy(&replyTime, data+SHORT_MAC_LEN+4, 2);
-				replyTime = myStaticTag->timePollReceived + DEFAULT_REPLY_DELAY_TIME;
+				memcpy(&replyTime, data+SHORT_MAC_LEN+4, 2);
+				// replyTime = myStaticTag->timePollReceived + DEFAULT_REPLY_DELAY_TIME;
 
 				//we configure our replyTime;
 				Serial.print("Reply time: ");
