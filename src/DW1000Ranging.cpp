@@ -635,7 +635,8 @@ void DW1000RangingClass::loop() {
 
 		if(DEBUG) {
 			visualizeDatas(data);
-			Serial.println(_replyDelayTimeUS);
+			Serial.print("Sent reply time: ");
+			Serial.print(_replyDelayTimeUS);
 		}
 		
 		if(messageType != POLL_ACK && messageType != POLL && messageType != RANGE)
@@ -702,7 +703,11 @@ void DW1000RangingClass::loop() {
 		//we read the datas from the modules:
 		// get message and parse
 		DW1000.getData(data, LEN_DATA);
-		visualizeDatas(data);
+		if(DEBUG) {
+			visualizeDatas(data);
+			Serial.print("Recieved reply time: ");
+			Serial.print(_replyDelayTimeUS);
+		}
 		
 		int messageType = detectMessageType(data);
 		
