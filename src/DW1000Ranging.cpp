@@ -516,7 +516,14 @@ void DW1000RangingClass::loop_anchor() {
 		if(DEBUG) {
 			visualizeDatas(data);
 		}
+
 		int messageType = detectMessageType(data);
+		if(messageType != _expectedMsgId) {
+			if(debug) {
+				Serial.println("Unexpected msg type!");
+			}
+			return;
+		}
 		
 
 		byte tag_address_short_byte[2];
@@ -544,7 +551,7 @@ void DW1000RangingClass::loop_anchor() {
 			//myTag->configureNetwork(tag_address_short_byte[0]*256+tag_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
 
 			//exepect POLL
-			if(messageType == POLL && _expectedMsgId == POLL) {
+			if(messageType == POLL) {
 				if(DEBUG) {
 				Serial.println("POLL received");
 				}
@@ -566,7 +573,7 @@ void DW1000RangingClass::loop_anchor() {
 					Serial.println("Sending POLL_ACK");
 				}
 
-			} else if((messageType == RANGE && _expectedMsgId == RANGE)) {
+			} else if(messageType == RANGE) {
 				if(DEBUG) {
 					Serial.println("RANGE RECIEVED");
 				}
