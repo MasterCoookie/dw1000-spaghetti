@@ -632,6 +632,11 @@ void DW1000RangingClass::loop() {
 		
 		// TODO cc
 		int messageType = detectMessageType(data);
+
+		if(DEBUG) {
+			visualizeDatas(data);
+			Serial.println(_replyDelayTimeUS);
+		}
 		
 		if(messageType != POLL_ACK && messageType != POLL && messageType != RANGE)
 			return;
