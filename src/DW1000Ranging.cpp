@@ -380,44 +380,52 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// expect ROS begin
 	if(_sentAck) {
-			Serial.print("Reply time:");
-			Serial.println(_replyDelayTimeUS);
-			_sentAck = false;
-			if(DW1000RangingClass::initProtocol) {
-				DW1000RangingClass::initProtocol = false;
-				byte anchor_address_byte[8];
-				
-				DW1000.convertToByte(anchor_address, anchor_address_byte);
+		Serial.print("Reply time:");
+		Serial.println(_replyDelayTimeUS);
+		_sentAck = false;
+		if(DW1000RangingClass::initProtocol) {
+			DW1000RangingClass::initProtocol = false;
+			byte anchor_address_byte[8];
+			
+			DW1000.convertToByte(anchor_address, anchor_address_byte);
 
 
-				byte anchor_address_short_byte[2];
-				anchor_address_short_byte[0] = anchor_address_byte[0];
-				anchor_address_short_byte[1] = anchor_address_byte[1];
+			byte anchor_address_short_byte[2];
+			anchor_address_short_byte[0] = anchor_address_byte[0];
+			anchor_address_short_byte[1] = anchor_address_byte[1];
 
 
 
-				myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
-				myStaticAnchor->setReplyTime(DEFAULT_REPLY_DELAY_TIME);
-				transmitPoll(myStaticAnchor);
-				_expectedMsgId = POLL_ACK;
-			} else {
-				if(DEBUG) {
+			myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
+			myStaticAnchor->setReplyTime(DEFAULT_REPLY_DELAY_TIME);
+			transmitPoll(myStaticAnchor);
+			_expectedMsgId = POLL_ACK;
+		} else {
+			if(DEBUG) {
 				Serial.println("Data sent:");
-					visualizeDatas(data);
-				}
-				int messageType = detectMessageType(data);
+				visualizeDatas(data);
+			}
+			int messageType = detectMessageType(data);
 
-				if(messageType == POLL) {
-					DW1000Time timePollSent;
-					DW1000.getTransmitTimestamp(timePollSent);
-					myStaticAnchor->timePollSent = timePollSent;
-				} else if(messageType == RANGE) {
-					DW1000Time timeRangeSent;
-					DW1000.getTransmitTimestamp(timeRangeSent);
-					myStaticAnchor->timeRangeSent = timeRangeSent;
+			if(messageType == POLL) {
+				DW1000Time timePollSent;
+				DW1000.getTransmitTimestamp(timePollSent);
+				myStaticAnchor->timePollSent = timePollSent;
+				if(DEBUG) {
+					Serial.print("POLL sent at timestamp: ");
+					myStaticAnchor->timePollSent.print();
 				}
-			}			
-		}
+			} else if(messageType == RANGE) {
+				DW1000Time timeRangeSent;
+				DW1000.getTransmitTimestamp(timeRangeSent);
+				myStaticAnchor->timeRangeSent = timeRangeSent;
+				if(DEBUG) {
+					Serial.print("RANGE sent at timestamp: ");
+					myStaticAnchor->timeRangeSent.print();
+				}
+			}
+		}			
+	}
 		
 		
 		// myAnchor->configureNetwork(anchor_address_short_byte[0]*256+anchor_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
@@ -452,6 +460,8 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 				
 				_expectedMsgId = RANGE_REPORT;
 				if(DEBUG) {
+					Serial.print(" at timestamp: ");
+					myStaticAnchor->timePollAckReceived.print();
 					Serial.println("RANGE SENT");
 				}
 			}
@@ -501,14 +511,17 @@ void DW1000RangingClass::loop_anchor() {
 	if(_sentAck) {
 		_sentAck = false;
 		if(DEBUG) {
-		Serial.println("Data sent:");
-		visualizeDatas(data);
+			Serial.println("Data sent:");
+			visualizeDatas(data);
 		}
 		int messageType = detectMessageType(data);
 		if(messageType == POLL_ACK) {
 			if (myStaticTag) {
 				DW1000.getTransmitTimestamp(myStaticTag->timePollAckSent);
 			}
+		}
+		if(messageType == RANGE_REPORT) {
+			Serial.println("Range report sent^");
 		}
 	} 
 	
@@ -531,19 +544,12 @@ void DW1000RangingClass::loop_anchor() {
 
 		
 		byte destenation_address_short_byte[2];
-		// byte tag_address_byte[8];	
-
-		
-		// _globalMac.decodeLongMACFrame(data, tag_address_byte);
-
 		_globalMac.decodeDestenationMACFrame(data, destenation_address_short_byte);
 
 		// Serial.print("Own address: ");
 		// displayShortAddress(_currentShortAddress);
 		// Serial.print("Decoded address: ");
 		// displayShortAddress(destenation_address_short_byte);
-
-		//TODO check recepient
 		if(destenation_address_short_byte[0] == _currentShortAddress[0] && destenation_address_short_byte[1] == _currentShortAddress[1]){
 			//get self address, compare with tag_address_byte
 			if(DEBUG) {
@@ -556,7 +562,7 @@ void DW1000RangingClass::loop_anchor() {
 			//exepect POLL
 			if(messageType == POLL) {
 				if(DEBUG) {
-					Serial.println("POLL received");
+					Serial.print("POLL received");
 				}
 				byte tag_address_short_byte[2];
 				_globalMac.decodeShortMACFrame(data, tag_address_short_byte);
@@ -581,6 +587,8 @@ void DW1000RangingClass::loop_anchor() {
 				DW1000.getReceiveTimestamp(myStaticTag->timePollReceived);
 				transmitPollAck(myStaticTag);
 				if(DEBUG) {
+					Serial.print(" at timestamp: ");
+					myStaticTag->timePollReceived.print();
 					Serial.println("Sending POLL_ACK");
 				}
 
@@ -590,13 +598,15 @@ void DW1000RangingClass::loop_anchor() {
 				}
 				DW1000.getReceiveTimestamp(myStaticTag->timeRangeReceived);
 				
-				myStaticTag->timePollSent.setTimestamp(data+SHORT_MAC_LEN+4);
-				myStaticTag->timePollAckReceived.setTimestamp(data+SHORT_MAC_LEN+9);
-				myStaticTag->timeRangeSent.setTimestamp(data+SHORT_MAC_LEN+14);
+				myStaticTag->timePollSent.setTimestamp(data+10);
+				myStaticTag->timePollAckReceived.setTimestamp(data+15);
+				myStaticTag->timeRangeSent.setTimestamp(data+20);
 
 				DW1000Time myTOF;
 				computeRangeAsymmetric(myStaticTag, &myTOF); 
 				float distance = myTOF.getAsMeters();
+				Serial.print("distance: ");
+				Serial.println(distance);
 
 				myStaticTag->setRXPower(DW1000.getReceivePower());
 				myStaticTag->setRange(distance);
@@ -1230,8 +1240,11 @@ void DW1000RangingClass::computeRangeAsymmetric(DW1000Device* myDistantDevice, D
 /* FOR DEBUGGING*/
 void DW1000RangingClass::visualizeDatas(byte datas[]) {
 	char string[60];
-	sprintf(string, "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
-					datas[0], datas[1], datas[2], datas[3], datas[4], datas[5], datas[6], datas[7], datas[8], datas[9], datas[10], datas[11], datas[12], datas[13], datas[14], datas[15]);
+	sprintf(string, "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
+					datas[0], datas[1], datas[2], datas[3], datas[4], datas[5], datas[6], datas[7], datas[8],
+					datas[9], datas[10], datas[11], datas[12], datas[13], datas[14], datas[15],
+					datas[16],datas[17],datas[18],datas[19]
+					);
 	Serial.println(string);
 }
 
