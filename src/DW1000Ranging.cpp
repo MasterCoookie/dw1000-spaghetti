@@ -520,6 +520,7 @@ void DW1000RangingClass::loop_anchor() {
 		}
 
 		int messageType = detectMessageType(data);
+		//TODO - reset protocole
 		if(messageType != _expectedMsgId) {
 			if(DEBUG) {
 				Serial.println("Unexpected msg type!");
@@ -636,7 +637,7 @@ void DW1000RangingClass::loop() {
 		if(DEBUG) {
 			visualizeDatas(data);
 			Serial.print("Sent reply time: ");
-			Serial.print(_replyDelayTimeUS);
+			Serial.println(_replyDelayTimeUS);
 		}
 		
 		if(messageType != POLL_ACK && messageType != POLL && messageType != RANGE)
@@ -706,7 +707,7 @@ void DW1000RangingClass::loop() {
 		if(DEBUG) {
 			visualizeDatas(data);
 			Serial.print("Recieved reply time: ");
-			Serial.print(_replyDelayTimeUS);
+			Serial.println(_replyDelayTimeUS);
 		}
 		
 		int messageType = detectMessageType(data);
