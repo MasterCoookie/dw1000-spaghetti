@@ -489,10 +489,10 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 				float curRXPower;
 				memcpy(&curRXPower, data+5+SHORT_MAC_LEN, 4);
 
-				curRange/=100.0f;
+				// curRange/=100.0f;
 				Serial.print("Range: ");
 				Serial.println(curRange);
-				curRXPower/=100.0f;
+				// curRXPower/=100.0f;
 				Serial.print("Power: ");
 				Serial.println(curRXPower);
 
