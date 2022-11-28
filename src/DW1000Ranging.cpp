@@ -430,6 +430,10 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 		
 
 	if(_receivedAck == true) {
+		//TODO check recepient
+		//TODO as part of ^ read data before ifs
+
+		//TODO handle unexpected message type
 		if(_expectedMsgId == POLL_ACK) {
 			_receivedAck = false;
 			DW1000.getData(data, LEN_DATA);
@@ -439,10 +443,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 			}
 			int messageType = detectMessageType(data);
 
-			//TODO check recepient !!
-			//read part of data which is responsible for recepient
-			//compare with our address
-
+			//TODO handle unexpected message type
 			if(messageType == POLL_ACK) {
 				if(DEBUG) {
 					Serial.println("POLL_ACK RECIEVED");
@@ -470,8 +471,8 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 				visualizeDatas(data);
 				Serial.println(messageType);
 			}
-			//TODO check recepient
 			
+			//TODO handle unexpected message type
 			if(messageType == RANGE_REPORT) {
 				if(DEBUG) {
 					Serial.println("RANGE_REPORT RECIEVED");
@@ -509,11 +510,10 @@ void DW1000RangingClass::loop_anchor() {
 			}
 		}
 
-		if(messageType == RANGE_REPORT) {
-			Serial.println("Range report sent^");
-		}
-
 		if(DEBUG) {
+			if(messageType == RANGE_REPORT) {
+				Serial.println("Range report sent^");
+			}
 			Serial.println("Data sent:");
 			visualizeDatas(data);
 		}
@@ -529,10 +529,13 @@ void DW1000RangingClass::loop_anchor() {
 		byte destenation_address_short_byte[2];
 		_globalMac.decodeDestenationMACFrame(data, destenation_address_short_byte);
 
-		// Serial.print("Own address: ");
-		// displayShortAddress(_currentShortAddress);
-		// Serial.print("Decoded address: ");
-		// displayShortAddress(destenation_address_short_byte);
+		if(DEBUG) {
+			Serial.print("Own address: ");
+			displayShortAddress(_currentShortAddress);
+			Serial.print("Decoded address: ");
+			displayShortAddress(destenation_address_short_byte);
+		}
+		
 		if(destenation_address_short_byte[0] == _currentShortAddress[0] && destenation_address_short_byte[1] == _currentShortAddress[1]){
 			if(DEBUG) {
 				Serial.println("self address matched!");
@@ -561,7 +564,6 @@ void DW1000RangingClass::loop_anchor() {
 
 				_expectedMsgId = RANGE;
 
-				//we grab the replytime wich is for us
 				uint16_t replyTime;
 
 				//TMP
