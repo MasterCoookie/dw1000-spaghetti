@@ -380,8 +380,10 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// expect ROS begin
 	if(_sentAck) {
-		Serial.print("Reply time:");
-		Serial.println(_replyDelayTimeUS);
+		if(DEBUG) {
+			Serial.print("Reply time:");
+			Serial.println(_replyDelayTimeUS);
+		}		
 		_sentAck = false;
 		if(DW1000RangingClass::initProtocol) {
 			DW1000RangingClass::initProtocol = false;
