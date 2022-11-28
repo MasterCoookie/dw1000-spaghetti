@@ -510,18 +510,20 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 void DW1000RangingClass::loop_anchor() {
 	if(_sentAck) {
 		_sentAck = false;
-		if(DEBUG) {
-			Serial.println("Data sent:");
-			visualizeDatas(data);
-		}
 		int messageType = detectMessageType(data);
 		if(messageType == POLL_ACK) {
 			if (myStaticTag) {
 				DW1000.getTransmitTimestamp(myStaticTag->timePollAckSent);
 			}
 		}
+
 		if(messageType == RANGE_REPORT) {
 			Serial.println("Range report sent^");
+		}
+
+		if(DEBUG) {
+			Serial.println("Data sent:");
+			visualizeDatas(data);
 		}
 	} 
 	
@@ -532,17 +534,6 @@ void DW1000RangingClass::loop_anchor() {
 			visualizeDatas(data);
 		}
 
-		int messageType = detectMessageType(data);
-		//TODO - reset protocole
-		if(messageType != _expectedMsgId) {
-			if(DEBUG) {
-				Serial.println("Unexpected msg type!");
-			}
-			return;
-		}
-		
-
-		
 		byte destenation_address_short_byte[2];
 		_globalMac.decodeDestenationMACFrame(data, destenation_address_short_byte);
 
@@ -551,14 +542,20 @@ void DW1000RangingClass::loop_anchor() {
 		// Serial.print("Decoded address: ");
 		// displayShortAddress(destenation_address_short_byte);
 		if(destenation_address_short_byte[0] == _currentShortAddress[0] && destenation_address_short_byte[1] == _currentShortAddress[1]){
-			//get self address, compare with tag_address_byte
 			if(DEBUG) {
 				Serial.println("self address matched!");
 			}
 
-			
-			//myTag->configureNetwork(tag_address_short_byte[0]*256+tag_address_short_byte[1], 0xDECA, DW1000.MODE_LONGDATA_RANGE_ACCURACY);
+			int messageType = detectMessageType(data);
+			//TODO - reset protocole
+			if(messageType != _expectedMsgId) {
+				if(DEBUG) {
+					Serial.println("Unexpected msg type!");
+				}
+				return;
+			}
 
+			
 			//exepect POLL
 			if(messageType == POLL) {
 				if(DEBUG) {
@@ -622,9 +619,6 @@ void DW1000RangingClass::loop_anchor() {
 
 				_expectedMsgId = POLL; //??
 			}	
-		}
-		else {
-			return;
 		}
 	}
 }
