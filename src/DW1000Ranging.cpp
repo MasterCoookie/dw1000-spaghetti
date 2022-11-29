@@ -433,70 +433,91 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 
 	if(_receivedAck == true) {
 		//TODO check recepient
+		//_receivedAck == false;
+		DW1000.getData(data, LEN_DATA);
+		byte destination_address_short_byte[2];
+		_globalMac.decodeDestenationMACFrame(data, destination_address_short_byte);
 		//TODO as part of ^ read data before ifs
-
-		//TODO handle unexpected message type
-		if(_expectedMsgId == POLL_ACK) {
-			_receivedAck = false;
-			DW1000.getData(data, LEN_DATA);
-			if(DEBUG) {
-				Serial.println("POLL_ACK expected, data received: ");
-				visualizeDatas(data);
-			}
-			int messageType = detectMessageType(data);
-
+		if(destination_address_short_byte[0] == _currentShortAddress[0] && destination_address_short_byte[1] == _currentShortAddress[1]) {
 			//TODO handle unexpected message type
-			if(messageType == POLL_ACK) {
+			if(_expectedMsgId == POLL_ACK) {
+				_receivedAck = false;
+				//DW1000.getData(data, LEN_DATA);
 				if(DEBUG) {
-					Serial.println("POLL_ACK RECIEVED");
+					Serial.println("POLL_ACK expected, data received: ");
+					visualizeDatas(data);
 				}
-				DW1000.getReceiveTimestamp(myStaticAnchor->timePollAckReceived);
-				//send FINAL to POLL recepient
-				transmitRange(myStaticAnchor);
-				
-				_expectedMsgId = RANGE_REPORT;
+				int messageType = detectMessageType(data);
+
+				//TODO handle unexpected message type
+				if(messageType == POLL_ACK) {
+					if(DEBUG) {
+						Serial.println("POLL_ACK RECIEVED");
+					}
+					DW1000.getReceiveTimestamp(myStaticAnchor->timePollAckReceived);
+					//send FINAL to POLL recepient
+					transmitRange(myStaticAnchor);
+					
+					_expectedMsgId = RANGE_REPORT;
+					if(DEBUG) {
+						Serial.print(" at timestamp: ");
+						myStaticAnchor->timePollAckReceived.print();
+						Serial.println("RANGE SENT");
+					}
+				}
+				else{
+					if(DEBUG) {
+						Serial.println("Received unexpected message type. Communication terminated.");
+					}
+					return;
+				}
+			}
+			// expect REPORT
+			else if(_expectedMsgId == RANGE_REPORT) {
+				_receivedAck = false;
+				//detect data type 
+				//DW1000.getData(data, LEN_DATA);
+				int messageType = detectMessageType(data);
 				if(DEBUG) {
-					Serial.print(" at timestamp: ");
-					myStaticAnchor->timePollAckReceived.print();
-					Serial.println("RANGE SENT");
+					Serial.println("POLL_ACK expected, data received: ");
+					visualizeDatas(data);
+					Serial.println(messageType);
+				}
+				
+				//TODO handle unexpected message type
+				if(messageType == RANGE_REPORT) {
+					if(DEBUG) {
+						Serial.println("RANGE_REPORT RECIEVED");
+					}
+					//read and decode REPORT
+					float curRange;
+					memcpy(&curRange, data+1+SHORT_MAC_LEN, 4);
+					float curRXPower;
+					memcpy(&curRXPower, data+5+SHORT_MAC_LEN, 4);
+
+					Serial.print("Range: ");
+					Serial.println(curRange);
+					// curRXPower/=100.0f;
+					Serial.print("Power: ");
+					Serial.println(curRXPower);
+
+
+					//spit out data to ROS
+					/*if(_handleNewRange != 0) {
+						(*_handleNewRange)();
+					}*/
+					//prepare for another round
+					DW1000RangingClass::initProtocol=true;
+					_sentAck = true;
+					
+					
+					
 				}
 			}
 		}
-		// expect REPORT
-		else if(_expectedMsgId == RANGE_REPORT) {
-			_receivedAck = false;
-			//detect data type 
-			DW1000.getData(data, LEN_DATA);
-			int messageType = detectMessageType(data);
+		else {
 			if(DEBUG) {
-				Serial.println("POLL_ACK expected, data received: ");
-				visualizeDatas(data);
-				Serial.println(messageType);
-			}
-			
-			//TODO handle unexpected message type
-			if(messageType == RANGE_REPORT) {
-				if(DEBUG) {
-					Serial.println("RANGE_REPORT RECIEVED");
-				}
-				//read and decode REPORT
-				float curRange;
-				memcpy(&curRange, data+1+SHORT_MAC_LEN, 4);
-				float curRXPower;
-				memcpy(&curRXPower, data+5+SHORT_MAC_LEN, 4);
-
-				Serial.print("Range: ");
-				Serial.println(curRange);
-				// curRXPower/=100.0f;
-				Serial.print("Power: ");
-				Serial.println(curRXPower);
-
-
-				//spit out data to ROS
-				/*if(_handleNewRange != 0) {
-					(*_handleNewRange)();
-				}*/
-				//prepare for another round
+				Serial.println("Incorrect message recipient.");
 			}
 		}
 	}
