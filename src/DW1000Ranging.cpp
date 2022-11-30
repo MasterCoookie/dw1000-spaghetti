@@ -508,10 +508,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 					}*/
 					//prepare for another round
 					DW1000RangingClass::initProtocol=true;
-					_sentAck = true;
-					
-					
-					
+					_sentAck = true;	
 				}
 			}
 		}
@@ -519,6 +516,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 			if(DEBUG) {
 				Serial.println("Incorrect message recipient.");
 			}
+			_receivedAck = false;
 		}
 	}
 }
