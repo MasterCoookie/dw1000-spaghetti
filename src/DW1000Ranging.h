@@ -125,6 +125,7 @@ public:
 	static void displayShortAddress(byte datas[]);
 	static void beginProtocol();
 	static void timeoutTAG();
+	static void timeoutANCHOR();
 
 
 	//own Methods
@@ -191,6 +192,7 @@ private:
 	static void handleReceived();
 	static void noteActivity();
 	static void resetInactive();
+	static void resetAnchor();
 	
 	//global functions:
 	static void checkForReset();
