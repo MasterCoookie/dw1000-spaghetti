@@ -64,7 +64,7 @@
 
 //debug mode
 #ifndef DEBUG
-#define DEBUG false
+#define DEBUG true
 #endif
 
 
@@ -124,6 +124,7 @@ public:
 	static void displayFullAddress(byte address[]);
 	static void displayShortAddress(byte datas[]);
 	static void beginProtocol();
+	static void timeoutTAG();
 
 
 	//own Methods

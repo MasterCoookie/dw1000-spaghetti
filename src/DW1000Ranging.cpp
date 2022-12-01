@@ -349,6 +349,17 @@ void DW1000RangingClass::checkForReset() {
 	}
 }
 
+void DW1000RangingClass::timeoutTAG() {
+	uint32_t curMillis = millis();
+	if(!_sentAck && !_receivedAck) {
+		// check if inactive
+		if(curMillis-_lastActivity > _resetPeriod) {
+			beginProtocol();
+		}
+		return; // TODO cc
+	}
+}
+
 void DW1000RangingClass::checkForInactiveDevices() {
 	for(uint8_t i = 0; i < _networkDevicesNumber; i++) {
 		if(_networkDevices[i].isInactive()) {
@@ -378,76 +389,93 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 }
 
 void DW1000RangingClass::loop_tag(char anchor_address[]) {
-	// expect ROS begin
+	if(DW1000RangingClass::initProtocol) {
+		DW1000RangingClass::initProtocol = false;
+		byte anchor_address_byte[8];
+		
+		DW1000.convertToByte(anchor_address, anchor_address_byte);
+
+
+		byte anchor_address_short_byte[2];
+		anchor_address_short_byte[0] = anchor_address_byte[0];
+		anchor_address_short_byte[1] = anchor_address_byte[1];
+
+
+		myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
+		myStaticAnchor->setReplyTime(DEFAULT_REPLY_DELAY_TIME);
+		transmitPoll(myStaticAnchor);
+		noteActivity();
+		_expectedMsgId = POLL_ACK;
+	}
+
+	timeoutTAG();
+	
 	if(_sentAck) {
 		if(DEBUG) {
 			Serial.print("Reply time:");
 			Serial.println(_replyDelayTimeUS);
 		}		
 		_sentAck = false;
-		if(DW1000RangingClass::initProtocol) {
-			DW1000RangingClass::initProtocol = false;
-			byte anchor_address_byte[8];
-			
-			DW1000.convertToByte(anchor_address, anchor_address_byte);
+		if(DEBUG) {
+			Serial.println("Data sent:");
+			visualizeDatas(data);
+		}
+		int messageType = detectMessageType(data);
 
+		if(messageType == POLL) {
+			DW1000Time timePollSent;
+			DW1000.getTransmitTimestamp(timePollSent);
+			myStaticAnchor->timePollSent = timePollSent;
 
-			byte anchor_address_short_byte[2];
-			anchor_address_short_byte[0] = anchor_address_byte[0];
-			anchor_address_short_byte[1] = anchor_address_byte[1];
-
-
-			myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
-			myStaticAnchor->setReplyTime(DEFAULT_REPLY_DELAY_TIME);
-			transmitPoll(myStaticAnchor);
-			_expectedMsgId = POLL_ACK;
-		} else {
 			if(DEBUG) {
-				Serial.println("Data sent:");
-				visualizeDatas(data);
+				Serial.print("POLL sent at timestamp: ");
+				myStaticAnchor->timePollSent.print();
 			}
-			int messageType = detectMessageType(data);
+		} else if(messageType == RANGE) {
+			DW1000Time timeRangeSent;
+			DW1000.getTransmitTimestamp(timeRangeSent);
+			myStaticAnchor->timeRangeSent = timeRangeSent;
 
-			if(messageType == POLL) {
-				DW1000Time timePollSent;
-				DW1000.getTransmitTimestamp(timePollSent);
-				myStaticAnchor->timePollSent = timePollSent;
-
-				if(DEBUG) {
-					Serial.print("POLL sent at timestamp: ");
-					myStaticAnchor->timePollSent.print();
-				}
-			} else if(messageType == RANGE) {
-				DW1000Time timeRangeSent;
-				DW1000.getTransmitTimestamp(timeRangeSent);
-				myStaticAnchor->timeRangeSent = timeRangeSent;
-
-				if(DEBUG) {
-					Serial.print("RANGE sent at timestamp: ");
-					myStaticAnchor->timeRangeSent.print();
-				}
+			if(DEBUG) {
+				Serial.print("RANGE sent at timestamp: ");
+				myStaticAnchor->timeRangeSent.print();
 			}
-		}			
+		}		
 	}
 		
 
-	if(_receivedAck == true) {
+	if(_receivedAck) {
 		//TODO check recepient
-		//_receivedAck == false;
+		_receivedAck = false;
 		DW1000.getData(data, LEN_DATA);
 		byte destination_address_short_byte[2];
 		_globalMac.decodeDestenationMACFrame(data, destination_address_short_byte);
 		//TODO as part of ^ read data before ifs
 		if(destination_address_short_byte[0] == _currentShortAddress[0] && destination_address_short_byte[1] == _currentShortAddress[1]) {
 			//TODO handle unexpected message type
+			int messageType = detectMessageType(data);
+
+				if(messageType != _expectedMsgId) {
+					if(DEBUG) {
+						Serial.println("Received unexpected message type. Communication terminated.");
+						Serial.print("Expected: ");
+						Serial.println(_expectedMsgId);
+						Serial.print("Received: ");
+						Serial.println(messageType);
+					}	
+					return;
+				}
+
+			noteActivity();
+
 			if(_expectedMsgId == POLL_ACK) {
-				_receivedAck = false;
+				//_receivedAck = false;
 				//DW1000.getData(data, LEN_DATA);
 				if(DEBUG) {
 					Serial.println("POLL_ACK expected, data received: ");
 					visualizeDatas(data);
 				}
-				int messageType = detectMessageType(data);
+				
 
 				//TODO handle unexpected message type
 				if(messageType == POLL_ACK) {
@@ -457,6 +485,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 					DW1000.getReceiveTimestamp(myStaticAnchor->timePollAckReceived);
 					//send FINAL to POLL recepient
 					transmitRange(myStaticAnchor);
+					noteActivity();
 					
 					_expectedMsgId = RANGE_REPORT;
 					if(DEBUG) {
@@ -465,19 +494,13 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 						Serial.println("RANGE SENT");
 					}
 				}
-				else{
-					if(DEBUG) {
-						Serial.println("Received unexpected message type. Communication terminated.");
-					}
-					return;
-				}
 			}
 			// expect REPORT
 			else if(_expectedMsgId == RANGE_REPORT) {
-				_receivedAck = false;
+				//_receivedAck = false;
 				//detect data type 
 				//DW1000.getData(data, LEN_DATA);
-				int messageType = detectMessageType(data);
+				
 				if(DEBUG) {
 					Serial.println("POLL_ACK expected, data received: ");
 					visualizeDatas(data);
@@ -507,16 +530,19 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 						(*_handleNewRange)();
 					}*/
 					//prepare for another round
-					DW1000RangingClass::initProtocol=true;
-					_sentAck = true;	
+					
+					//DW1000RangingClass::initProtocol=true;
+					//resets protocol to deafult settings
+					beginProtocol();
+					
 				}
 			}
 		}
 		else {
 			if(DEBUG) {
-				Serial.println("Incorrect message recipient.");
+				Serial.println("Incorrect message recipient. Ignoring request.");
 			}
-			_receivedAck = false;
+			//_receivedAck = false;
 		}
 	}
 }
@@ -1274,6 +1300,7 @@ void DW1000RangingClass::displayShortAddress(byte datas[]) {
 
 void DW1000RangingClass::beginProtocol() {
 	initProtocol = true;
+	myStaticAnchor = nullptr;
 }
 
 
