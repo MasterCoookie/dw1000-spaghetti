@@ -357,7 +357,7 @@ void DW1000RangingClass::timeoutTAG() {
 	uint32_t curMillis = millis();
 	if(!_sentAck && !_receivedAck) {
 		// check if inactive
-		if(curMillis-_lastActivity > _resetPeriod) {
+		if(curMillis-_lastActivity > (_resetPeriod + _resetPeriod)) {
 			resetInactive();
 			beginProtocol();
 			startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
