@@ -126,6 +126,7 @@ public:
 	static void beginProtocol();
 	static void timeoutTAG();
 	static void timeoutANCHOR();
+	static void prepareForAnotherRound();
 
 
 	//own Methods
@@ -143,6 +144,7 @@ private:
 	static int16_t      counterForBlink;
 	
 	static long long int cycleCounter;
+	static uint32_t currentTimeStamp;
 	
 	//Handlers:
 	static void (* _handleNewRange)(void);

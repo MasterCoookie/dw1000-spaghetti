@@ -63,6 +63,7 @@ boolean          DW1000RangingClass::_protocolFailed = false;
 int32_t            DW1000RangingClass::timer           = 0;
 int16_t            DW1000RangingClass::counterForBlink = 0; // TODO 8 bit?
 long long int	   DW1000RangingClass::cycleCounter = 0;
+uint32_t           DW1000RangingClass::currentTimeStamp = 0;
 
 
 // data buffer
@@ -365,6 +366,14 @@ void DW1000RangingClass::timeoutTAG() {
 	}
 }
 
+void DW1000RangingClass::prepareForAnotherRound() {
+	currentTimeStamp = millis();
+	while(currentTimeStamp + (_resetPeriod + 50)  > millis()) {
+
+	}					
+	DW1000RangingClass::initProtocol = true;
+}
+
 void DW1000RangingClass::timeoutANCHOR() {
 	uint32_t curMillis = millis();
 	//int diff = curMillis - _lastActivity;
@@ -571,7 +580,9 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 					//DW1000RangingClass::initProtocol=true;
 					//resets protocol to deafult settings
 					//beginProtocol();
-					
+				    
+					//wait for 250ms
+					prepareForAnotherRound();
 				}
 			}
 		}
