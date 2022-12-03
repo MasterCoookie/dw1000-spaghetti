@@ -224,8 +224,10 @@ void DW1000RangingClass::startAsTag(char address[], const byte mode[], const boo
 	generalStart();
 	//defined type as tag
 	_type = TAG;
+	if(DEBUG) {
+		Serial.println("### TAG ###");
+	}
 	
-	Serial.println("### TAG ###");
 }
 
 boolean DW1000RangingClass::addNetworkDevices(DW1000Device* device, boolean shortAddress) {
@@ -355,7 +357,9 @@ void DW1000RangingClass::timeoutTAG() {
 	if(!_sentAck && !_receivedAck) {
 		// check if inactive
 		if(curMillis-_lastActivity > _resetPeriod) {
+			resetInactive();
 			beginProtocol();
+			startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
 		}
 		return; // TODO cc
 	}
@@ -417,6 +421,8 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 }
 
 void DW1000RangingClass::loop_tag(char anchor_address[]) {
+	// checkForReset();
+	timeoutTAG();
 	if(DW1000RangingClass::initProtocol) {
 		DW1000RangingClass::initProtocol = false;
 		byte anchor_address_byte[8];
@@ -435,8 +441,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 		noteActivity();
 		_expectedMsgId = POLL_ACK;
 	}
-
-	timeoutTAG();
+	
 	
 	if(_sentAck) {
 		if(DEBUG) {
@@ -580,9 +585,11 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 }
 
 void DW1000RangingClass::loop_anchor() {
-	if(_expectedMsgId != POLL) {
-		timeoutANCHOR();
-	}
+	// if(_expectedMsgId != POLL) {
+	// 	timeoutANCHOR();
+	// }
+
+	checkForReset();
 	
 	if(_sentAck) {
 		_sentAck = false;
@@ -660,8 +667,11 @@ void DW1000RangingClass::loop_anchor() {
 				replyTime = DEFAULT_REPLY_DELAY_TIME;
 
 				//we configure our replyTime;
-				Serial.print("Reply time: ");
-				Serial.println(replyTime);
+				if(DEBUG) {
+					Serial.print("Reply time: ");
+					Serial.println(replyTime);
+				}
+				
 				_replyDelayTimeUS = replyTime;
 
 				DW1000.getReceiveTimestamp(myStaticTag->timePollReceived);
