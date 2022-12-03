@@ -695,8 +695,12 @@ void DW1000RangingClass::loop_anchor() {
 				
 				myStaticTag->setFPPower(DW1000.getFirstPathPower());
 				myStaticTag->setQuality(DW1000.getReceiveQuality());
+				if(DEBUG)
+				{
 				cycleCounter++;
+				Serial.print("Cycle number: ");
 				Serial.println(cycleCounter);
+				}
 				//we send the range to TAG
 				transmitRangeReport(myStaticTag);
 				noteActivity();
