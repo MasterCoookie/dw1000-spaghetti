@@ -142,6 +142,8 @@ private:
 	static int32_t      timer;
 	static int16_t      counterForBlink;
 	
+	static long long int cycleCounter;
+	
 	//Handlers:
 	static void (* _handleNewRange)(void);
 	static void (* _handleBlinkDevice)(DW1000Device*);
@@ -185,6 +187,7 @@ private:
 	inline static DW1000Device* myStaticAnchor;
 	inline static DW1000Device* myStaticTag;
 	inline static bool initProtocol;
+	
 	
 	
 	//methods

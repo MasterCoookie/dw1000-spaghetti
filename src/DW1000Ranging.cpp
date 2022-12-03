@@ -62,6 +62,7 @@ boolean          DW1000RangingClass::_protocolFailed = false;
 // timestamps to remember
 int32_t            DW1000RangingClass::timer           = 0;
 int16_t            DW1000RangingClass::counterForBlink = 0; // TODO 8 bit?
+long long int	   DW1000RangingClass::cycleCounter = 0;
 
 
 // data buffer
@@ -564,7 +565,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 					
 					//DW1000RangingClass::initProtocol=true;
 					//resets protocol to deafult settings
-					beginProtocol();
+					//beginProtocol();
 					
 				}
 			}
@@ -694,7 +695,8 @@ void DW1000RangingClass::loop_anchor() {
 				
 				myStaticTag->setFPPower(DW1000.getFirstPathPower());
 				myStaticTag->setQuality(DW1000.getReceiveQuality());
-				
+				cycleCounter++;
+				Serial.println(cycleCounter);
 				//we send the range to TAG
 				transmitRangeReport(myStaticTag);
 				noteActivity();
