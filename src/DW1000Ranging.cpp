@@ -368,7 +368,7 @@ void DW1000RangingClass::timeoutTAG() {
 
 void DW1000RangingClass::prepareForAnotherRound() {
 	currentTimeStamp = millis();
-	while(currentTimeStamp + (_resetPeriod + 50)  > millis()) {
+	while(currentTimeStamp + (50)  > millis()) {
 
 	}					
 	DW1000RangingClass::initProtocol = true;
