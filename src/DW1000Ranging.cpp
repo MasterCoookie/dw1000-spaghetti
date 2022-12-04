@@ -363,6 +363,7 @@ void DW1000RangingClass::timeoutTAG() {
 		// check if inactive
 		if(curMillis-_lastActivity > (_resetPeriod + _resetPeriod)) {
 			Serial.println("Timed out!");
+			protocolEnd = true;
 			startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
 			beginProtocol();
 		}
