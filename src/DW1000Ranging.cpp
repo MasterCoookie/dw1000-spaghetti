@@ -204,8 +204,11 @@ void DW1000RangingClass::startAsTag(char address[], const byte mode[], const boo
 	DW1000.convertToByte(address, _currentAddress);
 	//write the address on the DW1000 chip
 	DW1000.setEUI(address);
-	Serial.print("device address: ");
-	Serial.println(address);
+	if(DEBUG) {
+		Serial.print("device address: ");
+		Serial.println(address);
+	}
+	
 	if (randomShortAddress) {
 		//we need to define a random short address:
 		randomSeed(analogRead(0));
@@ -358,9 +361,9 @@ void DW1000RangingClass::timeoutTAG() {
 	if(!_sentAck && !_receivedAck) {
 		// check if inactive
 		if(curMillis-_lastActivity > (_resetPeriod + _resetPeriod)) {
-			resetInactive();
-			beginProtocol();
+			Serial.println("Timed out!");
 			startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+			beginProtocol();
 		}
 		return; // TODO cc
 	}
@@ -368,7 +371,7 @@ void DW1000RangingClass::timeoutTAG() {
 
 void DW1000RangingClass::prepareForAnotherRound() {
 	currentTimeStamp = millis();
-	while(currentTimeStamp + (50)  > millis()) {
+	while(currentTimeStamp + (150)  > millis()) {
 
 	}					
 	DW1000RangingClass::initProtocol = true;
@@ -509,6 +512,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 						Serial.println(messageType);
 					}	
 					beginProtocol();
+					startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
 					return;
 				}
 
@@ -1377,6 +1381,7 @@ void DW1000RangingClass::beginProtocol() {
 	initProtocol = true;
 	myStaticAnchor = nullptr;
 	myStaticTag = nullptr;
+	noteActivity();
 }
 
 
