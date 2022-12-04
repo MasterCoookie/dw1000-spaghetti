@@ -64,6 +64,7 @@ int32_t            DW1000RangingClass::timer           = 0;
 int16_t            DW1000RangingClass::counterForBlink = 0; // TODO 8 bit?
 long long int	   DW1000RangingClass::cycleCounter = 0;
 uint32_t           DW1000RangingClass::currentTimeStamp = 0;
+bool               DW1000RangingClass::protocolEnd = false;
 
 
 // data buffer
@@ -369,12 +370,11 @@ void DW1000RangingClass::timeoutTAG() {
 	}
 }
 
-void DW1000RangingClass::prepareForAnotherRound() {
-	currentTimeStamp = millis();
-	while(currentTimeStamp + (150)  > millis()) {
-
-	}					
+void DW1000RangingClass::prepareForAnotherRound() {				
+	if(currentTimeStamp + (150) < millis()) {
+	DW1000RangingClass::protocolEnd = false;
 	DW1000RangingClass::initProtocol = true;
+	}
 }
 
 void DW1000RangingClass::timeoutANCHOR() {
@@ -435,6 +435,9 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// checkForReset();
 	timeoutTAG();
+	if(protocolEnd) {
+		prepareForAnotherRound();
+	}
 	if(DW1000RangingClass::initProtocol) {
 		DW1000RangingClass::initProtocol = false;
 		byte anchor_address_byte[8];
@@ -585,8 +588,9 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 					//resets protocol to deafult settings
 					//beginProtocol();
 				    
-					//wait for 250ms
-					prepareForAnotherRound();
+					//wait for 250ms	
+					currentTimeStamp = millis();
+					protocolEnd = true;
 				}
 			}
 		}

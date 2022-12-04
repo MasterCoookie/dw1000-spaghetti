@@ -143,8 +143,10 @@ private:
 	static int32_t      timer;
 	static int16_t      counterForBlink;
 	
+	
 	static long long int cycleCounter;
 	static uint32_t currentTimeStamp;
+	static bool protocolEnd;
 	
 	//Handlers:
 	static void (* _handleNewRange)(void);
