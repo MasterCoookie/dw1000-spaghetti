@@ -147,6 +147,7 @@ private:
 	static long long int cycleCounter;
 	static uint32_t currentTimeStamp;
 	static bool protocolEnd;
+	static int timeOutCounter;
 	
 	//Handlers:
 	static void (* _handleNewRange)(void);
