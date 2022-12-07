@@ -148,6 +148,7 @@ private:
 	static uint32_t currentTimeStamp;
 	static bool protocolEnd;
 	static int timeOutCounter;
+	static int timeOutResetCount;
 	
 	//Handlers:
 	static void (* _handleNewRange)(void);

@@ -66,6 +66,7 @@ long long int	   DW1000RangingClass::cycleCounter = 0;
 uint32_t           DW1000RangingClass::currentTimeStamp = 0;
 bool               DW1000RangingClass::protocolEnd = false;
 int 			   DW1000RangingClass::timeOutCounter = 0;
+int 			   DW1000RangingClass::timeOutResetCount = 5;
 
 
 // data buffer
@@ -363,12 +364,11 @@ void DW1000RangingClass::timeoutTAG() {
 	if(!_sentAck && !_receivedAck) {
 		// check if inactive
 		if(curMillis-_lastActivity > (_resetPeriod + _resetPeriod)) {
-			if(timeOutCounter >= 5)
+			if(timeOutCounter++ >= timeOutResetCount)
 			{
 				ESP.restart();
 			}
 			Serial.println("Timed out!");
-			timeOutCounter++;
 			protocolEnd = true;
 			startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
 			beginProtocol();
