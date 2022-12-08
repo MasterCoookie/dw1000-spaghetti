@@ -68,6 +68,7 @@ bool               DW1000RangingClass::protocolEnd = false;
 int 			   DW1000RangingClass::timeOutCounter = 0;
 int 			   DW1000RangingClass::timeOutResetCount = 10;
 byte               DW1000RangingClass::destinationAddress[2];
+bool			   DW1000RangingClass::minimalSerialPrint = false;
 
 
 // data buffer
@@ -78,6 +79,8 @@ uint8_t   DW1000RangingClass::_SS;
 // watchdog and reset period
 uint32_t  DW1000RangingClass::_lastActivity;
 uint32_t  DW1000RangingClass::_resetPeriod;
+uint32_t  DW1000RangingClass::timeoutPeriod = 400;
+
 // reply times (same on both sides for symm. ranging)
 uint16_t  DW1000RangingClass::_replyDelayTimeUS;
 //timer delay
@@ -364,7 +367,7 @@ void DW1000RangingClass::timeoutTAG() {
 	uint32_t curMillis = millis();
 	if(!_sentAck && !_receivedAck) {
 		// check if inactive
-		if(curMillis-_lastActivity > (_resetPeriod + _resetPeriod)) {
+		if(curMillis-_lastActivity > timeoutPeriod) {
 			if(timeOutCounter++ >= timeOutResetCount)
 			{
 				ESP.restart();
@@ -586,11 +589,11 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 					memcpy(&curRXPower, data+5+SHORT_MAC_LEN, 4);
 					++cycleCounter;
 					printShortAddresses();
+					if(!minimalSerialPrint) {
 					Serial.print("Range: ");
-					Serial.print(curRange);
+					}
+					Serial.println(curRange);
 					// curRXPower/=100.0f;
-					Serial.print(" Power: ");
-					Serial.println(curRXPower);
 
 
 					//spit out data to ROS
@@ -1166,11 +1169,17 @@ void DW1000RangingClass::transmitInit() {
 }
 
 void DW1000RangingClass::printShortAddresses() {
-	Serial.print("From: ");
-	displayShortAddress(destinationAddress);
-	Serial.print(" To: ");
-	displayShortAddress(_currentShortAddress);
-	Serial.print(" ");
+	if(!minimalSerialPrint) {
+		Serial.print("From: ");
+		displayShortAddress(destinationAddress);
+		Serial.print(" To: ");
+		displayShortAddress(_currentShortAddress);
+		Serial.print(" ");
+	}
+	else {
+		displayShortAddress(destinationAddress);
+		displayShortAddress(_currentShortAddress);
+	}
 }
 
 
@@ -1343,6 +1352,13 @@ void DW1000RangingClass::receiver() {
 	// so we don't need to restart the receiver manually
 	DW1000.receivePermanently(true);
 	DW1000.startReceive();
+}
+
+void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint) {
+	timeoutPeriod = timeoutTime;
+	timeOutResetCount = resetCount;
+	minimalSerialPrint = minimalPrint;
+
 }
 
 

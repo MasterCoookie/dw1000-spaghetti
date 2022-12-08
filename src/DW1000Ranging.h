@@ -124,9 +124,11 @@ public:
 	static void displayFullAddress(byte address[]);
 	static void displayShortAddress(byte datas[]);
 	static void beginProtocol();
+	static void initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint);
 	static void timeoutTAG();
 	static void timeoutANCHOR();
 	static void prepareForAnotherRound();
+	
 
 
 	//own Methods
@@ -151,6 +153,8 @@ private:
 	static int timeOutResetCount;
 	static void printShortAddresses();
 	static byte destinationAddress[2];  
+	static uint32_t timeoutPeriod;
+	static bool minimalSerialPrint;
 	
 	//Handlers:
 	static void (* _handleNewRange)(void);
