@@ -66,7 +66,8 @@ long long int	   DW1000RangingClass::cycleCounter = 0;
 uint32_t           DW1000RangingClass::currentTimeStamp = 0;
 bool               DW1000RangingClass::protocolEnd = false;
 int 			   DW1000RangingClass::timeOutCounter = 0;
-int 			   DW1000RangingClass::timeOutResetCount = 5;
+int 			   DW1000RangingClass::timeOutResetCount = 10;
+byte               DW1000RangingClass::destinationAddress[2];
 
 
 // data buffer
@@ -441,9 +442,12 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 
 void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// checkForReset();
+	if(cycleCounter <= 200)
+	{
 	timeoutTAG();
 	if(protocolEnd) {
 		prepareForAnotherRound();
+	}
 	}
 	if(DW1000RangingClass::initProtocol) {
 		DW1000RangingClass::initProtocol = false;
@@ -455,6 +459,8 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 		byte anchor_address_short_byte[2];
 		anchor_address_short_byte[0] = anchor_address_byte[0];
 		anchor_address_short_byte[1] = anchor_address_byte[1];
+		destinationAddress[0] = anchor_address_short_byte[0];
+		destinationAddress[1] = anchor_address_short_byte[1];
 
 
 		myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
@@ -578,11 +584,12 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 					memcpy(&curRange, data+1+SHORT_MAC_LEN, 4);
 					float curRXPower;
 					memcpy(&curRXPower, data+5+SHORT_MAC_LEN, 4);
-
+					++cycleCounter;
+					printShortAddresses();
 					Serial.print("Range: ");
-					Serial.println(curRange);
+					Serial.print(curRange);
 					// curRXPower/=100.0f;
-					Serial.print("Power: ");
+					Serial.print(" Power: ");
 					Serial.println(curRXPower);
 
 
@@ -1158,6 +1165,14 @@ void DW1000RangingClass::transmitInit() {
 	DW1000.setDefaults();
 }
 
+void DW1000RangingClass::printShortAddresses() {
+	Serial.print("From: ");
+	displayShortAddress(destinationAddress);
+	Serial.print(" To: ");
+	displayShortAddress(_currentShortAddress);
+	Serial.print(" ");
+}
+
 
 void DW1000RangingClass::transmit(byte datas[]) {
 	DW1000.setData(datas, LEN_DATA);
@@ -1386,7 +1401,7 @@ void DW1000RangingClass::displayShortAddress(byte datas[]) {
 	char string[60];
 	sprintf(string, "%02X:%02X",
 					datas[0], datas[1]);
-	Serial.println(string);
+	Serial.print(string);
 }
 
 void DW1000RangingClass::beginProtocol() {

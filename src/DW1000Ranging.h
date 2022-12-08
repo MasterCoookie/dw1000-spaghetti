@@ -149,6 +149,8 @@ private:
 	static bool protocolEnd;
 	static int timeOutCounter;
 	static int timeOutResetCount;
+	static void printShortAddresses();
+	static byte destinationAddress[2];  
 	
 	//Handlers:
 	static void (* _handleNewRange)(void);
