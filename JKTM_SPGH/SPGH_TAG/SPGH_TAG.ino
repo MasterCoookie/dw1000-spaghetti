@@ -10,6 +10,7 @@
 const uint8_t PIN_RST = 27; // reset pin
 const uint8_t PIN_IRQ = 34; // irq pin
 const uint8_t PIN_SS = 4;   // spi select pin
+int cycleCount = 9999;
 
 void setup()
 {
@@ -36,8 +37,21 @@ void setup()
 
 void loop()
 {
-    DW1000Ranging.loop_tag("AA:BB:5B:D5:A9:9A:E2:9C");
+  int limiter = 200;
+  if(cycleCount < limiter) {
+    DW1000Ranging.loop_tag("AA:BB:5B:D5:A9:9A:E2:9C", 200);
+    cycleCount = DW1000Ranging.getCycleCounter();
+    //Serial.println(cycleCount);
     // DW1000Ranging.loop();
+  }
+  else if(Serial.available() != 0) {
+    String serialString = Serial.readString();
+    serialString.trim();
+    char buf[serialString.length()+1];
+    serialString.toCharArray(buf, serialString.length()+1);
+    //Serial.println(serialString);
+    DW1000Ranging.decodeSerial(buf);
+  }
 }
 
 void newRange()

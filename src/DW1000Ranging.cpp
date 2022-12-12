@@ -443,9 +443,9 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 	}
 }
 
-void DW1000RangingClass::loop_tag(char anchor_address[]) {
+void DW1000RangingClass::loop_tag(char anchor_address[], int cyclesLimit) {
 	// checkForReset();
-	if(cycleCounter <= 200)
+	if(cycleCounter <= cyclesLimit)
 	{
 	timeoutTAG();
 	if(protocolEnd) {
@@ -1359,6 +1359,14 @@ void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCoun
 	timeOutResetCount = resetCount;
 	minimalSerialPrint = minimalPrint;
 
+}
+
+void DW1000RangingClass::decodeSerial(char serialString[]) {
+	Serial.println(serialString);
+}
+
+int DW1000RangingClass::getCycleCounter() {
+	return cycleCounter;
 }
 
 
