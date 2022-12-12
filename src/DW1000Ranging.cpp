@@ -1362,7 +1362,10 @@ void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCoun
 }
 
 void DW1000RangingClass::decodeSerial(char serialString[]) {
-	Serial.println(serialString);
+	//Serial.println(serialString);
+	//Serial.println(serialString);
+	char anchorAddressChar[6] = {serialString[0], serialString[1], serialString[2], serialString[3], serialString[4]}; 
+	Serial.println(anchorAddressChar);
 }
 
 int DW1000RangingClass::getCycleCounter() {
