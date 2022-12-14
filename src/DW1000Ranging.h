@@ -137,7 +137,7 @@ public:
 	static int getCycleCounter();
 	static std::string getAnchorAddressFromSerial();
 	static int getRangingProtocolNumber();
-	static bool decodeSerial(char serialString[]);  
+	static bool decodeSerial(char serialString[], int serialInputLength);  
 
 private:
 	//other devices in the network

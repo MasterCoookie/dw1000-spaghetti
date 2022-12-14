@@ -15,6 +15,7 @@ int limiter = 200;
 std::string anchorAddress;
 char anchorAddressChar[5];
 int numberOfRangingProtocols;
+int serialInputLength = 0;
 
 void setup()
 {
@@ -49,10 +50,11 @@ void loop()
   }
   else if(Serial.available() != 0) {
     String serialString = Serial.readString();
+    serialInputLength = serialString.length();
     serialString.trim();
     char buf[serialString.length()+1];
     serialString.toCharArray(buf, serialString.length()+1);
-    if(DW1000Ranging.decodeSerial(buf)) {
+    if(DW1000Ranging.decodeSerial(buf, serialInputLength)) {
       Serial.println("Success");
       anchorAddress.clear();
       anchorAddress = DW1000Ranging.getAnchorAddressFromSerial();
