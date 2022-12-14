@@ -447,7 +447,7 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 
 void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// checkForReset();
-	timeoutTAG();
+	
 	if(protocolEnd) {
 		prepareForAnotherRound();
 	}
@@ -509,7 +509,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 			}
 		}		
 	}
-		
+		timeoutTAG();
 
 	if(_receivedAck) {
 		//TODO check recepient
@@ -619,6 +619,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 			//_receivedAck = false;
 		}
 	}
+	
 }
 
 void DW1000RangingClass::loop_anchor() {
