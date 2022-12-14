@@ -55,13 +55,13 @@ void loop()
     char buf[serialString.length()+1];
     serialString.toCharArray(buf, serialString.length()+1);
     if(DW1000Ranging.decodeSerial(buf, serialInputLength)) {
-      Serial.println("Success");
+      //Serial.println("Success");
       anchorAddress.clear();
       anchorAddress = DW1000Ranging.getAnchorAddressFromSerial();
       numberOfRangingProtocols = DW1000Ranging.getRangingProtocolNumber();
       strcpy(anchorAddressChar, anchorAddress.c_str());
-      Serial.println(anchorAddressChar);
-      Serial.println(numberOfRangingProtocols);  
+      //Serial.println(anchorAddressChar);
+      //Serial.println(numberOfRangingProtocols);  
       limiter = numberOfRangingProtocols;
       cycleCount = 0;
     }
