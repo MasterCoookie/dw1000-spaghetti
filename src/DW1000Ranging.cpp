@@ -1369,8 +1369,17 @@ void DW1000RangingClass::decodeSerial(char serialString[]) {
 	std::string numberOfProtocolsString;
 	numberOfProtocolsString.push_back(serialString[5]);
 	numberOfProtocolsString.push_back(serialString[6]);
+	try {
 	int numberOfProtocols = std::stoi(numberOfProtocolsString);
 	Serial.println(numberOfProtocols);
+	}
+	catch(std::invalid_argument& e)
+	{
+		if(DEBUG)
+		{
+		Serial.println("Parsing failure.");
+		}
+	}
 	
 	
 }
