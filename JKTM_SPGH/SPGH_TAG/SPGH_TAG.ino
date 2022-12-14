@@ -43,8 +43,12 @@ void setup()
 void loop()
 {
   if(cycleCount < limiter) {
-    DW1000Ranging.loop_tag(anchorAddressChar, 200);
+    Serial.println(cycleCount);    
+    DW1000Ranging.loop_tag(anchorAddressChar);
     cycleCount = DW1000Ranging.getCycleCounter();
+    Serial.println(cycleCount);
+    Serial.println(anchorAddressChar);
+    Serial.println("Test");
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();
   }
@@ -64,6 +68,7 @@ void loop()
       //Serial.println(numberOfRangingProtocols);  
       limiter = numberOfRangingProtocols;
       cycleCount = 0;
+      DW1000Ranging.setCycleCounter();
     }
   }
 }

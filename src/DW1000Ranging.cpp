@@ -445,15 +445,13 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 	}
 }
 
-void DW1000RangingClass::loop_tag(char anchor_address[], int cyclesLimit) {
+void DW1000RangingClass::loop_tag(char anchor_address[]) {
 	// checkForReset();
-	if(cycleCounter <= cyclesLimit)
-	{
 	timeoutTAG();
 	if(protocolEnd) {
 		prepareForAnotherRound();
 	}
-	}
+	
 	if(DW1000RangingClass::initProtocol) {
 		DW1000RangingClass::initProtocol = false;
 		byte anchor_address_byte[8];
@@ -1394,6 +1392,10 @@ bool DW1000RangingClass::decodeSerial(char serialString[], int serialInputLength
 
 int DW1000RangingClass::getCycleCounter() {
 	return cycleCounter;
+}
+
+void DW1000RangingClass::setCycleCounter() {
+	cycleCounter = 0;
 }
 
 std::string DW1000RangingClass::getAnchorAddressFromSerial() {

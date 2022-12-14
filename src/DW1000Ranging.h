@@ -100,7 +100,7 @@ public:
 	static int16_t detectMessageType(byte datas[]); // TODO check return type
 	static void loop();
 	static void loop_anchor();
-	static void loop_tag(char anchor_address[], int cyclesLimit);
+	static void loop_tag(char anchor_address[]);
 	static void useRangeFilter(boolean enabled);
 	// Used for the smoothing algorithm (Exponential Moving Average). newValue must be >= 2. Default 15.
 	static void setRangeFilterValue(uint16_t newValue);
@@ -135,6 +135,7 @@ public:
 
 	//own Methods
 	static int getCycleCounter();
+	static void setCycleCounter();
 	static std::string getAnchorAddressFromSerial();
 	static int getRangingProtocolNumber();
 	static bool decodeSerial(char serialString[], int serialInputLength);  
