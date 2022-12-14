@@ -64,7 +64,7 @@
 
 //debug mode
 #ifndef DEBUG
-#define DEBUG false
+#define DEBUG true
 #endif
 
 
@@ -157,6 +157,7 @@ private:
 	static byte destinationAddress[2];  
 	static uint32_t timeoutPeriod;
 	static bool minimalSerialPrint;
+	static int rangingProtocolNumber;
 	
 	//Handlers:
 	static void (* _handleNewRange)(void);

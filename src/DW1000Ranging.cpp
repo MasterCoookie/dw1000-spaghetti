@@ -69,6 +69,7 @@ int 			   DW1000RangingClass::timeOutCounter = 0;
 int 			   DW1000RangingClass::timeOutResetCount = 10;
 byte               DW1000RangingClass::destinationAddress[2];
 bool			   DW1000RangingClass::minimalSerialPrint = false;
+int                DW1000RangingClass::rangingProtocolNumber = 0;
 
 
 // data buffer
@@ -1370,18 +1371,17 @@ void DW1000RangingClass::decodeSerial(char serialString[]) {
 	numberOfProtocolsString.push_back(serialString[5]);
 	numberOfProtocolsString.push_back(serialString[6]);
 	try {
-	int numberOfProtocols = std::stoi(numberOfProtocolsString);
-	Serial.println(numberOfProtocols);
+		int numberOfProtocols = std::stoi(numberOfProtocolsString);
+		if(DEBUG) {
+		Serial.println(numberOfProtocols);
+		}
+		rangingProtocolNumber = numberOfProtocols;
 	}
-	catch(std::invalid_argument& e)
-	{
-		if(DEBUG)
-		{
+	catch(std::invalid_argument& e) {
+		if(DEBUG) {
 		Serial.println("Parsing failure.");
 		}
 	}
-	
-	
 }
 
 int DW1000RangingClass::getCycleCounter() {
