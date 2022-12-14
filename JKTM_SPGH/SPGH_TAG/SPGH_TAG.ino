@@ -60,7 +60,6 @@ void loop()
       anchorAddress = DW1000Ranging.getAnchorAddressFromSerial();
       numberOfRangingProtocols = DW1000Ranging.getRangingProtocolNumber();
       strcpy(anchorAddressChar, anchorAddress.c_str());
-      //anchorAddressChar = anchorAddress.c_str();
       Serial.println(anchorAddressChar);
       Serial.println(numberOfRangingProtocols);  
       limiter = numberOfRangingProtocols;
