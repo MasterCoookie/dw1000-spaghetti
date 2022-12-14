@@ -1376,20 +1376,17 @@ bool DW1000RangingClass::decodeSerial(char serialString[], int serialInputLength
 	for(int i = 5; i < serialInputLength; i++) {
 		numberOfProtocolsString.push_back(serialString[i]);
 	}
-	/*numberOfProtocolsString.push_back(serialString[5]);
-	numberOfProtocolsString.push_back(serialString[6]);*/
-	//std::copy(anchorAddressChar, anchorAddressChar+5, anchorAddressFromSerial);
 	try {
 		int numberOfProtocols = std::stoi(numberOfProtocolsString);
 		if(DEBUG) {
-		Serial.println(numberOfProtocols);
+			Serial.println(numberOfProtocols);
 		}
 		rangingProtocolNumber = numberOfProtocols;
 		return true;
 	}
 	catch(std::invalid_argument& e) {
 		if(DEBUG) {
-		Serial.println("Parsing failure.");
+			Serial.println("Parsing failure.");
 		}
 	}
 	return false;
