@@ -1366,6 +1366,13 @@ void DW1000RangingClass::decodeSerial(char serialString[]) {
 	//Serial.println(serialString);
 	char anchorAddressChar[6] = {serialString[0], serialString[1], serialString[2], serialString[3], serialString[4]}; 
 	Serial.println(anchorAddressChar);
+	std::string numberOfProtocolsString;
+	numberOfProtocolsString.push_back(serialString[5]);
+	numberOfProtocolsString.push_back(serialString[6]);
+	int numberOfProtocols = std::stoi(numberOfProtocolsString);
+	Serial.println(numberOfProtocols);
+	
+	
 }
 
 int DW1000RangingClass::getCycleCounter() {
