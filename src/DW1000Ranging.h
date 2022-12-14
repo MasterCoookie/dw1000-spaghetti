@@ -64,7 +64,7 @@
 
 //debug mode
 #ifndef DEBUG
-#define DEBUG true
+#define DEBUG false
 #endif
 
 
@@ -104,8 +104,7 @@ public:
 	static void useRangeFilter(boolean enabled);
 	// Used for the smoothing algorithm (Exponential Moving Average). newValue must be >= 2. Default 15.
 	static void setRangeFilterValue(uint16_t newValue);
-	static int getCycleCounter();
-	static void decodeSerial(char serialString[]);  
+	
 	
 	//Handlers:
 	static void attachNewRange(void (* handleNewRange)(void)) { _handleNewRange = handleNewRange; };
@@ -131,9 +130,14 @@ public:
 	static void timeoutANCHOR();
 	static void prepareForAnotherRound();
 	
+	
 
 
 	//own Methods
+	static int getCycleCounter();
+	static std::string getAnchorAddressFromSerial();
+	static int getRangingProtocolNumber();
+	static bool decodeSerial(char serialString[]);  
 
 private:
 	//other devices in the network
@@ -158,6 +162,8 @@ private:
 	static uint32_t timeoutPeriod;
 	static bool minimalSerialPrint;
 	static int rangingProtocolNumber;
+	//static char anchorAddressFromSerial[6];
+	static std::string anchorAddressFromSerial;
 	
 	//Handlers:
 	static void (* _handleNewRange)(void);

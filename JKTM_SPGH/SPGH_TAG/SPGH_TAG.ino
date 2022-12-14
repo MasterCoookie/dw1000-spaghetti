@@ -11,6 +11,9 @@ const uint8_t PIN_RST = 27; // reset pin
 const uint8_t PIN_IRQ = 34; // irq pin
 const uint8_t PIN_SS = 4;   // spi select pin
 int cycleCount = 9999;
+std::string anchorAddress;
+char anchorAddressChar[5];
+int numberOfRangingProtocols;
 
 void setup()
 {
@@ -50,7 +53,16 @@ void loop()
     char buf[serialString.length()+1];
     serialString.toCharArray(buf, serialString.length()+1);
     //Serial.println(serialString);
-    DW1000Ranging.decodeSerial(buf);
+    if(DW1000Ranging.decodeSerial(buf)) {
+      Serial.println("Success");
+      anchorAddress.clear();
+      anchorAddress = DW1000Ranging.getAnchorAddressFromSerial();
+      numberOfRangingProtocols = DW1000Ranging.getRangingProtocolNumber();
+      strcpy(anchorAddressChar, anchorAddress.c_str());
+      //anchorAddressChar = anchorAddress.c_str();
+      Serial.println(anchorAddressChar);
+      Serial.println(numberOfRangingProtocols);  
+    }
   }
 }
 

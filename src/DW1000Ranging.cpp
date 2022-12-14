@@ -70,6 +70,7 @@ int 			   DW1000RangingClass::timeOutResetCount = 10;
 byte               DW1000RangingClass::destinationAddress[2];
 bool			   DW1000RangingClass::minimalSerialPrint = false;
 int                DW1000RangingClass::rangingProtocolNumber = 0;
+std::string        DW1000RangingClass::anchorAddressFromSerial;
 
 
 // data buffer
@@ -1362,30 +1363,45 @@ void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCoun
 
 }
 
-void DW1000RangingClass::decodeSerial(char serialString[]) {
+bool DW1000RangingClass::decodeSerial(char serialString[]) {
 	//Serial.println(serialString);
 	//Serial.println(serialString);
-	char anchorAddressChar[6] = {serialString[0], serialString[1], serialString[2], serialString[3], serialString[4]}; 
-	Serial.println(anchorAddressChar);
+	/*char anchorAddressChar[6] = {serialString[0], serialString[1], serialString[2], serialString[3], serialString[4]};*/ 
+	//Serial.println(anchorAddressChar);
+	anchorAddressFromSerial.clear();
+	for(int i =0; i< 5; i++) {
+		anchorAddressFromSerial.push_back(serialString[i]);
+	}
 	std::string numberOfProtocolsString;
 	numberOfProtocolsString.push_back(serialString[5]);
 	numberOfProtocolsString.push_back(serialString[6]);
+	//std::copy(anchorAddressChar, anchorAddressChar+5, anchorAddressFromSerial);
 	try {
 		int numberOfProtocols = std::stoi(numberOfProtocolsString);
 		if(DEBUG) {
 		Serial.println(numberOfProtocols);
 		}
 		rangingProtocolNumber = numberOfProtocols;
+		return true;
 	}
 	catch(std::invalid_argument& e) {
 		if(DEBUG) {
 		Serial.println("Parsing failure.");
 		}
 	}
+	return false;
 }
 
 int DW1000RangingClass::getCycleCounter() {
 	return cycleCounter;
+}
+
+std::string DW1000RangingClass::getAnchorAddressFromSerial() {
+	return anchorAddressFromSerial;
+}
+
+int DW1000RangingClass::getRangingProtocolNumber() {
+	return rangingProtocolNumber;
 }
 
 
