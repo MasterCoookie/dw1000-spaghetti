@@ -71,6 +71,7 @@ byte               DW1000RangingClass::destinationAddress[2];
 bool			   DW1000RangingClass::minimalSerialPrint = false;
 int                DW1000RangingClass::rangingProtocolNumber = 0;
 std::string        DW1000RangingClass::anchorAddressFromSerial;
+int                DW1000RangingClass::delayAfterCommunication = 150;
 
 
 // data buffer
@@ -384,7 +385,7 @@ void DW1000RangingClass::timeoutTAG() {
 }
 
 void DW1000RangingClass::prepareForAnotherRound() {				
-	if(currentTimeStamp + (150) < millis()) {
+	if(currentTimeStamp + delayAfterCommunication < millis()) {
 	DW1000RangingClass::protocolEnd = false;
 	DW1000RangingClass::initProtocol = true;
 	}
@@ -1355,10 +1356,11 @@ void DW1000RangingClass::receiver() {
 	DW1000.startReceive();
 }
 
-void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint) {
+void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom) {
 	timeoutPeriod = timeoutTime;
 	timeOutResetCount = resetCount;
 	minimalSerialPrint = minimalPrint;
+	delayAfterCommunication = delayAfterCom;
 
 }
 

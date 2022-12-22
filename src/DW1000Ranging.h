@@ -125,7 +125,7 @@ public:
 	static void displayFullAddress(byte address[]);
 	static void displayShortAddress(byte datas[]);
 	static void beginProtocol();
-	static void initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint);
+	static void initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom);
 	static void timeoutTAG();
 	static void timeoutANCHOR();
 	static void prepareForAnotherRound();
@@ -165,6 +165,7 @@ private:
 	static int rangingProtocolNumber;
 	//static char anchorAddressFromSerial[6];
 	static std::string anchorAddressFromSerial;
+	static int delayAfterCommunication;
 	
 	//Handlers:
 	static void (* _handleNewRange)(void);
