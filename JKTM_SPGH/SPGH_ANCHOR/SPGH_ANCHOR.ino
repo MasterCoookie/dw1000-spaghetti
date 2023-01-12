@@ -24,6 +24,7 @@ void setup()
     DW1000Ranging.attachNewRange(newRange);
     DW1000Ranging.attachBlinkDevice(newBlink);
     DW1000Ranging.attachInactiveDevice(inactiveDevice);
+    DW1000.setAntennaDelay(16610);
     //Enable the filter to smooth the distance
     //DW1000Ranging.useRangeFilter(true);
 
