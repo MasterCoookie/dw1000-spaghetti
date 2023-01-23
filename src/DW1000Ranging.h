@@ -151,6 +151,7 @@ private:
 	static DW1000Mac    _globalMac;
 	static int32_t      timer;
 	static int16_t      counterForBlink;
+
 	
 	
 	static long long int cycleCounter;
@@ -166,6 +167,7 @@ private:
 	//static char anchorAddressFromSerial[6];
 	static std::string anchorAddressFromSerial;
 	static int delayAfterCommunication;
+	static char tagAddress[24];
 	
 	//Handlers:
 	static void (* _handleNewRange)(void);

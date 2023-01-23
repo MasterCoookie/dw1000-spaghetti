@@ -72,6 +72,7 @@ bool			   DW1000RangingClass::minimalSerialPrint = false;
 int                DW1000RangingClass::rangingProtocolNumber = 0;
 std::string        DW1000RangingClass::anchorAddressFromSerial;
 int                DW1000RangingClass::delayAfterCommunication = 150;
+char               DW1000RangingClass::tagAddress[24];
 
 
 // data buffer
@@ -211,6 +212,7 @@ void DW1000RangingClass::startAsAnchor(char address[], const byte mode[], const 
 
 void DW1000RangingClass::startAsTag(char address[], const byte mode[], const bool randomShortAddress) {
 	//save the address
+	strcpy(tagAddress, address);
 	DW1000.convertToByte(address, _currentAddress);
 	//write the address on the DW1000 chip
 	DW1000.setEUI(address);
@@ -377,7 +379,8 @@ void DW1000RangingClass::timeoutTAG() {
 			}
 			Serial.println("Timed out!");
 			protocolEnd = true;
-			startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+			//todo start as tag with the same address
+			startAsTag(tagAddress, DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
 			beginProtocol();
 		}
 		return; // TODO cc
@@ -532,7 +535,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 						Serial.println(messageType);
 					}	
 					beginProtocol();
-					startAsTag("7D:00:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+					startAsTag(tagAddress, DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
 					return;
 				}
 
