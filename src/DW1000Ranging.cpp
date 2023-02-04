@@ -593,14 +593,26 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 					memcpy(&curRXPower, data+5+SHORT_MAC_LEN, 4);
 					++cycleCounter;
 					printShortAddresses();
+
 					if(!minimalSerialPrint) {
-					Serial.print("Range: ");
+						Serial.print("Range: ");
+						Serial.print(curRange);
+					} else {
+						Serial.print(curRange);
 					}
-					Serial.println(curRange);
-					// curRXPower/=100.0f;
+					
 
+					if(!minimalSerialPrint) {
+						Serial.print("RX power: ");
+						Serial.println(curRXPower);
+					} else {
+						Serial.print("|");
+						Serial.println(curRXPower);
+					}
 
-					//spit out data to ROS
+					
+
+					
 					/*if(_handleNewRange != 0) {
 						(*_handleNewRange)();
 					}*/
@@ -747,11 +759,10 @@ void DW1000RangingClass::loop_anchor() {
 				
 				myStaticTag->setFPPower(DW1000.getFirstPathPower());
 				myStaticTag->setQuality(DW1000.getReceiveQuality());
-				if(DEBUG)
-				{
-				cycleCounter++;
-				Serial.print("Cycle number: ");
-				Serial.println(cycleCounter);
+				if(DEBUG) {
+					cycleCounter++;
+					Serial.print("Cycle number: ");
+					Serial.println(cycleCounter);
 				}
 				//we send the range to TAG
 				transmitRangeReport(myStaticTag);
