@@ -597,6 +597,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 					if(!minimalSerialPrint) {
 						Serial.print("Range: ");
 						Serial.print(curRange);
+						Serial.print(" m ");
 					} else {
 						Serial.print(curRange);
 					}
@@ -604,7 +605,8 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 
 					if(!minimalSerialPrint) {
 						Serial.print("RX power: ");
-						Serial.println(curRXPower);
+						Serial.print(curRXPower);
+						Serial.println(" dBm");
 					} else {
 						Serial.print("|");
 						Serial.println(curRXPower);
