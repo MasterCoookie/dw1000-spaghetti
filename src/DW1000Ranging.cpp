@@ -599,6 +599,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 						Serial.print(curRange);
 						Serial.print(" m ");
 					} else {
+						Serial.print("|");
 						Serial.print(curRange);
 					}
 					
