@@ -30,12 +30,13 @@ BLEAdvertising* pAdvertising;
 
 class MyServerCallbacks: public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) override {
-    Serial.print("New BLE device connected");
+    Serial.println("New BLE device connected");
     deviceConnected = true;
   };
   void onDisconnect(BLEServer* pServer) override {
-    Serial.print("BLE device disconnected");
+    Serial.println("BLE device disconnected");
     deviceConnected = false;
+    pAdvertising->start();
   }
 };
 
