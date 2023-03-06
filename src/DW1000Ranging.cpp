@@ -614,13 +614,24 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 					} else {
 						Serial.print("|");
 						Serial.println(curRXPower);
-						if(pReadCharacteristic != nullptr) {
-						String bleString = "|Dziala|";
-						pReadCharacteristic->setValue(bleString.c_str());
-						}
+						
 					}
 
-					
+					if(pReadCharacteristic != nullptr) {
+						String bleString;
+						char addrString[60];
+						sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
+						bleString += addrString;
+						sprintf(addrString, "%02X:%02X",_currentShortAddress[0], _currentShortAddress[1]);
+						bleString += addrString;
+						bleString += "|";
+						std::string s = std::to_string(curRange);
+						bleString += s.c_str();
+						bleString += "|";
+						s = std::to_string(curRXPower);
+						bleString += s.c_str();
+						pReadCharacteristic->setValue(bleString.c_str());
+						}
 
 					
 					/*if(_handleNewRange != 0) {
