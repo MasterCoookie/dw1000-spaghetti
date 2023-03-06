@@ -9,8 +9,9 @@
 #define SPI_MOSI 23
 #define DW_CS 4
 
-#define SERVICE_UUID "eda3620e-0e6a-11ed-861d-0242ac120002"
-#define CHARACTERISTIC_UUID "f67783e2-0e6a-11ed-861d-0242ac120002"
+#define SERVICE_UUID "50218d18-bc42-11ed-afa1-0242ac120002"
+#define READ_CHARACTERISTIC_UUID "57eb6e60-bc42-11ed-afa1-0242ac120002"
+#define WRITE_CHARACTERISTIC_UUID "5b28fd72-bc42-11ed-afa1-0242ac120002"
 
 // connection pins
 const uint8_t PIN_RST = 27; // reset pin
@@ -28,11 +29,11 @@ BLEServer* pServer;
 BLEAdvertising* pAdvertising;
 
 class MyServerCallbacks: public BLEServerCallbacks {
-  void onConnect(BLEServer* pServer) {
+  void onConnect(BLEServer* pServer) override {
     Serial.print("New BLE device connected");
     deviceConnected = true;
   };
-  void onDisconnect(BLEServer* pServer) {
+  void onDisconnect(BLEServer* pServer) override {
     Serial.print("BLE device disconnected");
     deviceConnected = false;
   }
@@ -40,14 +41,19 @@ class MyServerCallbacks: public BLEServerCallbacks {
 
 class RemoteCallback: public BLECharacteristicCallbacks {
   public:
-   void onWrite(BLECharacteristic *pCharacteristic) {
+   void onWrite(BLECharacteristic *pCharacteristic) override {
     std::string value = pCharacteristic->getValue();
+    
+    Serial.println();
     Serial.println("*********");
     Serial.print("New value: ");
 
+    String readData;
     for (int i = 0; i < value.length(); i++) {
-      Serial.print(value[i]);
+      // Serial.print(value[i]);
+      readData += value[i];
     }
+    Serial.println(readData);
   }
 };
 
@@ -76,6 +82,7 @@ void setup()
   
     Serial.println("DW1000 setup complete");
     
+    //starting BLE
     Serial.println("Initializing BLE");
     BLEDevice::init("SPGH-TAG");
     pServer = BLEDevice::createServer();
@@ -83,8 +90,10 @@ void setup()
 
     BLEService *pService = pServer->createService(SERVICE_UUID);
 
-    BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
-    pCharacteristic->setCallbacks(new RemoteCallback());
+    BLECharacteristic *pWriteCharacteristic = pService->createCharacteristic(WRITE_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
+    BLECharacteristic *pReadCharacteristic = pService->createCharacteristic(READ_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ);
+    pWriteCharacteristic->setCallbacks(new RemoteCallback());
+    pReadCharacteristic->setValue("Hello Dupa");
 
     pService->start();
 
