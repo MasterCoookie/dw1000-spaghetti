@@ -10,6 +10,7 @@
 #define DW_CS 4
 
 #define SERVICE_UUID "eda3620e-0e6a-11ed-861d-0242ac120002"
+#define CHARACTERISTIC_UUID "f67783e2-0e6a-11ed-861d-0242ac120002"
 
 // connection pins
 const uint8_t PIN_RST = 27; // reset pin
@@ -22,11 +23,39 @@ char anchorAddressChar[5];
 int numberOfRangingProtocols;
 int serialInputLength = 0;
 
+bool deviceConnected = false;
+BLEServer* pServer;
+BLEAdvertising* pAdvertising;
+
+class MyServerCallbacks: public BLEServerCallbacks {
+  void onConnect(BLEServer* pServer) {
+    Serial.print("New BLE device connected");
+    deviceConnected = true;
+  };
+  void onDisconnect(BLEServer* pServer) {
+    Serial.print("BLE device disconnected");
+    deviceConnected = false;
+  }
+};
+
+class RemoteCallback: public BLECharacteristicCallbacks {
+  public:
+   void onWrite(BLECharacteristic *pCharacteristic) {
+    std::string value = pCharacteristic->getValue();
+    Serial.println("*********");
+    Serial.print("New value: ");
+
+    for (int i = 0; i < value.length(); i++) {
+      Serial.print(value[i]);
+    }
+  }
+};
+
 void setup()
 {
     Serial.begin(115200);
     delay(1000);
-    Serial.println("Initializing DW1000")
+    Serial.println("Initializing DW1000");
     //init the configuration
     SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
     DW1000Ranging.initCommunication(PIN_RST, PIN_SS, PIN_IRQ); //Reset, CS, IRQ pin
@@ -45,16 +74,17 @@ void setup()
     DW1000Ranging.setSentAck(true);
     DW1000Ranging.beginProtocol();
   
-    Serial.println("DW1000 setup complete")
+    Serial.println("DW1000 setup complete");
     
-    Serial.println("Initializing BLE")
+    Serial.println("Initializing BLE");
     BLEDevice::init("SPGH-TAG");
     pServer = BLEDevice::createServer();
+    pServer->setCallbacks(new MyServerCallbacks());
 
     BLEService *pService = pServer->createService(SERVICE_UUID);
 
     BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
-    pCharacteristic->setCallbacks(new RemoteCallback(curtain));
+    pCharacteristic->setCallbacks(new RemoteCallback());
 
     pService->start();
 
