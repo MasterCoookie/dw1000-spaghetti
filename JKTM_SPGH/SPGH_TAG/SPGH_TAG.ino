@@ -23,10 +23,15 @@ std::string anchorAddress;
 char anchorAddressChar[5];
 int numberOfRangingProtocols;
 int serialInputLength = 0;
+int inputLength = 0;
 
 bool deviceConnected = false;
 BLEServer* pServer;
 BLEAdvertising* pAdvertising;
+BLECharacteristic *pWriteCharacteristic;
+BLECharacteristic *pReadCharacteristic;
+bool receivedData = false;
+String currentData;
 
 class MyServerCallbacks: public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) override {
@@ -44,17 +49,19 @@ class RemoteCallback: public BLECharacteristicCallbacks {
   public:
    void onWrite(BLECharacteristic *pCharacteristic) override {
     std::string value = pCharacteristic->getValue();
-    
+    /*
     Serial.println();
     Serial.println("*********");
     Serial.print("New value: ");
-
+*/
     String readData;
     for (int i = 0; i < value.length(); i++) {
       // Serial.print(value[i]);
       readData += value[i];
     }
-    Serial.println(readData);
+    currentData = readData;
+    receivedData = true;
+    //Serial.println(readData);
   }
 };
 
@@ -91,8 +98,8 @@ void setup()
 
     BLEService *pService = pServer->createService(SERVICE_UUID);
 
-    BLECharacteristic *pWriteCharacteristic = pService->createCharacteristic(WRITE_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
-    BLECharacteristic *pReadCharacteristic = pService->createCharacteristic(READ_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ);
+    pWriteCharacteristic = pService->createCharacteristic(WRITE_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
+    pReadCharacteristic = pService->createCharacteristic(READ_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ);
     pWriteCharacteristic->setCallbacks(new RemoteCallback());
     pReadCharacteristic->setValue("Hello Dupa");
 
@@ -104,6 +111,22 @@ void setup()
     Serial.println("BLE setup complete");
 }
 
+void initCom(String dataString) {
+    inputLength = dataString.length();
+    dataString.trim();
+    char buf[inputLength+1];
+    dataString.toCharArray(buf, inputLength+1);
+    if(DW1000Ranging.decodeSerial(buf, inputLength)) {
+      anchorAddress.clear();
+      anchorAddress = DW1000Ranging.getAnchorAddressFromSerial();
+      numberOfRangingProtocols = DW1000Ranging.getRangingProtocolNumber();
+      strcpy(anchorAddressChar, anchorAddress.c_str());
+      limiter = numberOfRangingProtocols;
+      cycleCount = 0;
+      DW1000Ranging.setCycleCounter();
+    }
+}
+
 void loop()
 {
   if(cycleCount < limiter) {   
@@ -112,7 +135,12 @@ void loop()
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();
   }
-  else if(Serial.available() != 0) {
+  else if(receivedData)
+  {
+    receivedData = false;
+    initCom(currentData);
+  }
+  /*else if(Serial.available() != 0) {
     String serialString = Serial.readString();
     serialInputLength = serialString.length();
     serialString.trim();
@@ -130,7 +158,7 @@ void loop()
       cycleCount = 0;
       DW1000Ranging.setCycleCounter();
     }
-  }
+  }*/
 }
 
 void newRange()
