@@ -9,6 +9,8 @@
 #define SPI_MOSI 23
 #define DW_CS 4
 
+#define SERVICE_UUID "eda3620e-0e6a-11ed-861d-0242ac120002"
+
 // connection pins
 const uint8_t PIN_RST = 27; // reset pin
 const uint8_t PIN_IRQ = 34; // irq pin
@@ -24,6 +26,7 @@ void setup()
 {
     Serial.begin(115200);
     delay(1000);
+    Serial.println("Initializing DW1000")
     //init the configuration
     SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
     DW1000Ranging.initCommunication(PIN_RST, PIN_SS, PIN_IRQ); //Reset, CS, IRQ pin
@@ -41,7 +44,24 @@ void setup()
     //to make it run first time
     DW1000Ranging.setSentAck(true);
     DW1000Ranging.beginProtocol();
+  
+    Serial.println("DW1000 setup complete")
     
+    Serial.println("Initializing BLE")
+    BLEDevice::init("SPGH-TAG");
+    pServer = BLEDevice::createServer();
+
+    BLEService *pService = pServer->createService(SERVICE_UUID);
+
+    BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
+    pCharacteristic->setCallbacks(new RemoteCallback(curtain));
+
+    pService->start();
+
+    pAdvertising = pServer->getAdvertising();
+    pAdvertising->start();
+
+    Serial.println("BLE setup complete");
 }
 
 void loop()
