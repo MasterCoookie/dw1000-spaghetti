@@ -29,6 +29,9 @@
 
 #include "DW1000Ranging.h"
 #include "DW1000Device.h"
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
 
 DW1000RangingClass DW1000Ranging;
 
@@ -449,7 +452,7 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 	}
 }
 
-void DW1000RangingClass::loop_tag(char anchor_address[]) {
+void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pReadCharacteristic) {
 	// checkForReset();
 	
 	if(protocolEnd) {
@@ -611,6 +614,10 @@ void DW1000RangingClass::loop_tag(char anchor_address[]) {
 					} else {
 						Serial.print("|");
 						Serial.println(curRXPower);
+						if(pReadCharacteristic != nullptr) {
+						String bleString = "|Dziala|";
+						pReadCharacteristic->setValue(bleString.c_str());
+						}
 					}
 
 					

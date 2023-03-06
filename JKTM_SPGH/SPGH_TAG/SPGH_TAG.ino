@@ -130,7 +130,7 @@ void initCom(String dataString) {
 void loop()
 {
   if(cycleCount < limiter) {   
-    DW1000Ranging.loop_tag(anchorAddressChar);
+    DW1000Ranging.loop_tag(anchorAddressChar, pReadCharacteristic);
     cycleCount = DW1000Ranging.getCycleCounter();
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();

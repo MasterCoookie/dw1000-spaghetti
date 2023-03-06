@@ -30,6 +30,9 @@
 #include "DW1000Time.h"
 #include "DW1000Device.h" 
 #include "DW1000Mac.h"
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
 
 // messages used in the ranging protocol
 #define POLL 0
@@ -100,7 +103,7 @@ public:
 	static int16_t detectMessageType(byte datas[]); // TODO check return type
 	static void loop();
 	static void loop_anchor();
-	static void loop_tag(char anchor_address[]);
+	static void loop_tag(char anchor_address[], BLECharacteristic *pReadCharacteristic = nullptr);
 	static void useRangeFilter(boolean enabled);
 	// Used for the smoothing algorithm (Exponential Moving Average). newValue must be >= 2. Default 15.
 	static void setRangeFilterValue(uint16_t newValue);
