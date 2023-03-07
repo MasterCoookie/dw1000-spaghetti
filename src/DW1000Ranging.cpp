@@ -376,11 +376,12 @@ void DW1000RangingClass::timeoutTAG() {
 	if(!_sentAck && !_receivedAck) {
 		// check if inactive
 		if(curMillis-_lastActivity > timeoutPeriod) {
-			if(timeOutCounter++ >= timeOutResetCount)
+			/*if(timeOutCounter++ >= timeOutResetCount)
 			{
 				ESP.restart();
-			}
+			}*/
 			Serial.println("Timed out!");
+			++cycleCounter;
 			protocolEnd = true;
 			//todo start as tag with the same address
 			startAsTag(tagAddress, DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
@@ -583,7 +584,6 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 					visualizeDatas(data);
 					Serial.println(messageType);
 				}
-				
 				//TODO handle unexpected message type
 				if(messageType == RANGE_REPORT) {
 					if(DEBUG) {

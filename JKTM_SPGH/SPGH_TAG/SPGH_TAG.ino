@@ -92,7 +92,7 @@ void setup()
     
     //starting BLE
     Serial.println("Initializing BLE");
-    BLEDevice::init("SPGH-TAG");
+    BLEDevice::init("SPGH-TAG" + std::to_string((random(0,50))));
     pServer = BLEDevice::createServer();
     pServer->setCallbacks(new MyServerCallbacks());
 
