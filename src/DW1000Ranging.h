@@ -76,7 +76,7 @@ public:
 	//variables
 	// data buffer
 	static byte data[LEN_DATA];
-	static const int delayTable[46];
+	static const int delayTable[740];
 	
 	//initialisation
 	static void    initCommunication(uint8_t myRST = DEFAULT_RST_PIN, uint8_t mySS = DEFAULT_SPI_SS_PIN, uint8_t myIRQ = 2);
