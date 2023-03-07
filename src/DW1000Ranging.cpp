@@ -29,9 +29,7 @@
 
 #include "DW1000Ranging.h"
 #include "DW1000Device.h"
-#include <BLEDevice.h>
-#include <BLEUtils.h>
-#include <BLEServer.h>
+#include <chrono>
 
 DW1000RangingClass DW1000Ranging;
 
@@ -473,7 +471,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 		}
 		Serial.println(randomNumber);
 		DW1000.convertToByte(anchor_address, anchor_address_byte);
-
+		_replyDelayTimeUS = randomNumber;
 
 		byte anchor_address_short_byte[2];
 		anchor_address_short_byte[0] = anchor_address_byte[0];
@@ -483,7 +481,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 
 
 		myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
-		myStaticAnchor->setReplyTime(DEFAULT_REPLY_DELAY_TIME);
+		myStaticAnchor->setReplyTime(randomNumber);
 		transmitPoll(myStaticAnchor);
 		noteActivity();
 		_expectedMsgId = POLL_ACK;
@@ -746,8 +744,9 @@ void DW1000RangingClass::loop_anchor() {
 				uint16_t replyTime;
 
 				//TMP
-				// memcpy(&replyTime, data+SHORT_MAC_LEN+2, 2);
-				replyTime = DEFAULT_REPLY_DELAY_TIME;
+				memcpy(&replyTime, data+SHORT_MAC_LEN+2, 2);
+				// replyTime = DEFAULT_REPLY_DELAY_TIME;
+				Serial.println(replyTime);
 
 				//we configure our replyTime;
 				if(DEBUG) {
