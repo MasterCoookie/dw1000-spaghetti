@@ -470,8 +470,10 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 			randomNumber-=73;
 		}
 		Serial.println(randomNumber);
+		int randomDelayTime = delayTable[randomNumber];
 		DW1000.convertToByte(anchor_address, anchor_address_byte);
-		_replyDelayTimeUS = randomNumber;
+		Serial.println(randomDelayTime);
+		_replyDelayTimeUS = randomDelayTime;
 
 		byte anchor_address_short_byte[2];
 		anchor_address_short_byte[0] = anchor_address_byte[0];
@@ -481,7 +483,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 
 
 		myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
-		myStaticAnchor->setReplyTime(randomNumber);
+		myStaticAnchor->setReplyTime(randomDelayTime);
 		transmitPoll(myStaticAnchor);
 		noteActivity();
 		_expectedMsgId = POLL_ACK;
