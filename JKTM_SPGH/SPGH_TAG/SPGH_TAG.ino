@@ -13,6 +13,8 @@
 #define READ_CHARACTERISTIC_UUID "57eb6e60-bc42-11ed-afa1-0242ac120002"
 #define WRITE_CHARACTERISTIC_UUID "5b28fd72-bc42-11ed-afa1-0242ac120002"
 
+#define IF_SERIAL true
+
 // connection pins
 const uint8_t PIN_RST = 27; // reset pin
 const uint8_t PIN_IRQ = 34; // irq pin
@@ -92,7 +94,7 @@ void setup()
     
     //starting BLE
     Serial.println("Initializing BLE");
-    std::string BLEID = "SPGH-TAG5";
+    std::string BLEID = "SPGH-TAG3";
     BLEDevice::init(BLEID);
     Serial.println(BLEID.c_str());
     pServer = BLEDevice::createServer();
@@ -103,7 +105,7 @@ void setup()
     pWriteCharacteristic = pService->createCharacteristic(WRITE_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
     pReadCharacteristic = pService->createCharacteristic(READ_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ);
     pWriteCharacteristic->setCallbacks(new RemoteCallback());
-    pReadCharacteristic->setValue("Hello Dupa");
+    pReadCharacteristic->setValue("Hello Wojtek");
 
     pService->start();
 
@@ -142,25 +144,12 @@ void loop()
     receivedData = false;
     initCom(currentData);
   }
-  /*else if(Serial.available() != 0) {
+  else if(IF_SERIAL && Serial.available() != 0) {
+  if(Serial.available() != 0) {
     String serialString = Serial.readString();
-    serialInputLength = serialString.length();
-    serialString.trim();
-    char buf[serialString.length()+1];
-    serialString.toCharArray(buf, serialString.length()+1);
-    if(DW1000Ranging.decodeSerial(buf, serialInputLength)) {
-      //Serial.println("Success");
-      anchorAddress.clear();
-      anchorAddress = DW1000Ranging.getAnchorAddressFromSerial();
-      numberOfRangingProtocols = DW1000Ranging.getRangingProtocolNumber();
-      strcpy(anchorAddressChar, anchorAddress.c_str());
-      //Serial.println(anchorAddressChar);
-      //Serial.println(numberOfRangingProtocols);  
-      limiter = numberOfRangingProtocols;
-      cycleCount = 0;
-      DW1000Ranging.setCycleCounter();
+    initCom(serialString);
     }
-  }*/
+  }
 }
 
 void newRange()

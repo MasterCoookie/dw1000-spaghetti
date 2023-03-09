@@ -469,10 +469,8 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 		if(randomNumber > 740) {
 			randomNumber-=73;
 		}
-		Serial.println(randomNumber);
 		int randomDelayTime = delayTable[randomNumber];
 		DW1000.convertToByte(anchor_address, anchor_address_byte);
-		Serial.println(randomDelayTime);
 		_replyDelayTimeUS = randomDelayTime;
 
 		byte anchor_address_short_byte[2];
