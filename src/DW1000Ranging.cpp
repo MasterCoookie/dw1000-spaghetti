@@ -1411,7 +1411,7 @@ void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCoun
 
 }
 
-bool DW1000RangingClass::decodeInputParams(char inputString[], int serialStringLength) {
+bool DW1000RangingClass::decodeInputParams(char inputString[], int inputStringLength) {
 	//Serial.println(serialString);
 	//Serial.println(serialString);
 	/*char anchorAddressChar[6] = {serialString[0], serialString[1], serialString[2], serialString[3], serialString[4]};*/ 
@@ -1421,7 +1421,7 @@ bool DW1000RangingClass::decodeInputParams(char inputString[], int serialStringL
 		anchorAddressFromSerial.push_back(inputString[i]);
 	}
 	std::string numberOfProtocolsString;
-	for(int i = 5; i < serialStringLength; i++) {
+	for(int i = 5; i < inputStringLength; i++) {
 		numberOfProtocolsString.push_back(inputString[i]);
 	}
 	try {
