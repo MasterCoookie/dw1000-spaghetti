@@ -70,14 +70,14 @@
 #define DEBUG false
 #endif
 
-#define RANDOM_DELAY_TABLE_MODE false
+#define RANDOM_DELAY_TABLE_MODE true
 
 class DW1000RangingClass {
 public:
 	//variables
 	// data buffer
 	static byte data[LEN_DATA];
-	static const int delayTable[740];
+	static const int delayTable[335];
 	
 	//initialisation
 	static void    initCommunication(uint8_t myRST = DEFAULT_RST_PIN, uint8_t mySS = DEFAULT_SPI_SS_PIN, uint8_t myIRQ = 2);
