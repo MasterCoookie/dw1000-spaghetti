@@ -475,6 +475,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 			_replyDelayTimeUS = randomDelayTime;
 		}
 		else {
+			DW1000.convertToByte(anchor_address, anchor_address_byte);
 			_replyDelayTimeUS = DEFAULT_REPLY_DELAY_TIME;
 		}
 

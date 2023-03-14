@@ -70,7 +70,7 @@
 #define DEBUG false
 #endif
 
-#define RANDOM_DELAY_TABLE_MODE true
+#define RANDOM_DELAY_TABLE_MODE false
 
 class DW1000RangingClass {
 public:
