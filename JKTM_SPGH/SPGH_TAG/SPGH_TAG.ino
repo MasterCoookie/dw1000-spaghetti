@@ -85,7 +85,7 @@ void setup()
     //we start the module as a tag
   
     DW1000Ranging.initializeVariables(250, 10, true, 100);
-    DW1000Ranging.startAsTag("FF:F0:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+    DW1000Ranging.startAsTag("FF:12:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
     //to make it run first time
     DW1000Ranging.setSentAck(true);
     DW1000Ranging.beginProtocol();
@@ -94,7 +94,7 @@ void setup()
     
     //starting BLE
     Serial.println("Initializing BLE");
-    std::string BLEID = "SPGH-TAG3";
+    std::string BLEID = "SPGH-TAG-DEV";
     BLEDevice::init(BLEID);
     Serial.println(BLEID.c_str());
     pServer = BLEDevice::createServer();
@@ -120,7 +120,7 @@ void initCom(String dataString) {
     dataString.trim();
     char buf[inputLength+1];
     dataString.toCharArray(buf, inputLength+1);
-    if(DW1000Ranging.decodeSerial(buf, inputLength)) {
+    if(DW1000Ranging.decodeInputParams(buf, inputLength)) {
       anchorAddress.clear();
       anchorAddress = DW1000Ranging.getAnchorAddressFromSerial();
       numberOfRangingProtocols = DW1000Ranging.getRangingProtocolNumber();

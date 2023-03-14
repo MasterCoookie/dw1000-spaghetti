@@ -70,6 +70,7 @@
 #define DEBUG false
 #endif
 
+#define RANDOM_DELAY_TABLE_MODE true
 
 class DW1000RangingClass {
 public:
@@ -142,7 +143,7 @@ public:
 	static void setCycleCounter();
 	static std::string getAnchorAddressFromSerial();
 	static int getRangingProtocolNumber();
-	static bool decodeSerial(char serialString[], int serialInputLength);  
+	static bool decodeInputParams(char inputString[], int inputStringLength);  
 
 private:
 	//other devices in the network

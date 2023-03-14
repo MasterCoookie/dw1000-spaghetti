@@ -463,15 +463,20 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 	if(DW1000RangingClass::initProtocol) {
 		DW1000RangingClass::initProtocol = false;
 		byte anchor_address_byte[8];
-		uint32_t randomNumber = esp_random();
-		randomNumber = std::pow(randomNumber, 1/3.);
-		randomNumber/=2;
-		if(randomNumber > 740) {
-			randomNumber-=73;
+		if(RANDOM_DELAY_TABLE_MODE) {
+			uint32_t randomNumber = esp_random();
+			randomNumber = std::pow(randomNumber, 1/3.);
+			randomNumber/=2;
+			if(randomNumber > 740) {
+				randomNumber-=73;
+			}
+			int randomDelayTime = delayTable[randomNumber];
+			DW1000.convertToByte(anchor_address, anchor_address_byte);
+			_replyDelayTimeUS = randomDelayTime;
 		}
-		int randomDelayTime = delayTable[randomNumber];
-		DW1000.convertToByte(anchor_address, anchor_address_byte);
-		_replyDelayTimeUS = randomDelayTime;
+		else {
+			_replyDelayTimeUS = DEFAULT_REPLY_DELAY_TIME;
+		}
 
 		byte anchor_address_short_byte[2];
 		anchor_address_short_byte[0] = anchor_address_byte[0];
@@ -481,7 +486,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 
 
 		myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
-		myStaticAnchor->setReplyTime(randomDelayTime);
+		myStaticAnchor->setReplyTime(_replyDelayTimeUS);
 		transmitPoll(myStaticAnchor);
 		noteActivity();
 		_expectedMsgId = POLL_ACK;
@@ -1406,18 +1411,18 @@ void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCoun
 
 }
 
-bool DW1000RangingClass::decodeSerial(char serialString[], int serialInputLength) {
+bool DW1000RangingClass::decodeInputParams(char inputString[], int serialStringLength) {
 	//Serial.println(serialString);
 	//Serial.println(serialString);
 	/*char anchorAddressChar[6] = {serialString[0], serialString[1], serialString[2], serialString[3], serialString[4]};*/ 
 	//Serial.println(anchorAddressChar);
 	anchorAddressFromSerial.clear();
 	for(int i = 0; i < 5; i++) {
-		anchorAddressFromSerial.push_back(serialString[i]);
+		anchorAddressFromSerial.push_back(inputString[i]);
 	}
 	std::string numberOfProtocolsString;
-	for(int i = 5; i < serialInputLength; i++) {
-		numberOfProtocolsString.push_back(serialString[i]);
+	for(int i = 5; i < serialStringLength; i++) {
+		numberOfProtocolsString.push_back(inputString[i]);
 	}
 	try {
 		int numberOfProtocols = std::stoi(numberOfProtocolsString);
