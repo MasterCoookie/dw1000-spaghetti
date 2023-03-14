@@ -246,6 +246,7 @@ void DW1000RangingClass::startAsTag(char address[], const byte mode[], const boo
 	if(DEBUG) {
 		Serial.println("### TAG ###");
 	}
+	Serial.println(address);
 	
 }
 
