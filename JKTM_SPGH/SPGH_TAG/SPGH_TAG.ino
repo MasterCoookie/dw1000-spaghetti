@@ -13,6 +13,8 @@
 #define READ_CHARACTERISTIC_UUID "57eb6e60-bc42-11ed-afa1-0242ac120002"
 #define WRITE_CHARACTERISTIC_UUID "5b28fd72-bc42-11ed-afa1-0242ac120002"
 
+uint8_t newMACAddress[] = {0x90, 0x84, 0x2B, 0x4A, 0x3A, 0x0A};
+
 #define IF_SERIAL true
 
 // connection pins
@@ -34,6 +36,7 @@ BLECharacteristic *pWriteCharacteristic;
 BLECharacteristic *pReadCharacteristic;
 bool receivedData = false;
 String currentData;
+
 
 class MyServerCallbacks: public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) override {
@@ -85,7 +88,7 @@ void setup()
     //we start the module as a tag
   
     DW1000Ranging.initializeVariables(250, 10, true, 100);
-    DW1000Ranging.startAsTag("FF:12:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+    DW1000Ranging.startAsTag("FF:02:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
     //to make it run first time
     DW1000Ranging.setSentAck(true);
     DW1000Ranging.beginProtocol();
@@ -94,7 +97,8 @@ void setup()
     
     //starting BLE
     Serial.println("Initializing BLE");
-    std::string BLEID = "SPGH-TAG-DEV";
+    std::string BLEID = "SPGH-TAG-DEV1";
+    esp_base_mac_addr_set(&newMACAddress[0]);
     BLEDevice::init(BLEID);
     Serial.println(BLEID.c_str());
     pServer = BLEDevice::createServer();

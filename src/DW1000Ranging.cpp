@@ -381,7 +381,8 @@ void DW1000RangingClass::timeoutTAG() {
 			{
 				ESP.restart();
 			}*/
-			Serial.println("Timed out!");
+			Serial.print("Timed out!|");
+			Serial.println(_replyDelayTimeUS);
 			++cycleCounter;
 			protocolEnd = true;
 			//todo start as tag with the same address
@@ -469,7 +470,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 			randomNumber = std::pow(randomNumber, 1/3.);
 			randomNumber/=4;
 			if(randomNumber > 335) {
-				randomNumber-=72;
+				randomNumber-=73;
 			}
 			int randomDelayTime = delayTable[randomNumber];
 			DW1000.convertToByte(anchor_address, anchor_address_byte);
