@@ -12,6 +12,7 @@
 #define SERVICE_UUID "50218d18-bc42-11ed-afa1-0242ac120002"
 #define READ_CHARACTERISTIC_UUID "57eb6e60-bc42-11ed-afa1-0242ac120002"
 #define WRITE_CHARACTERISTIC_UUID "5b28fd72-bc42-11ed-afa1-0242ac120002"
+#define DELAY_WRITE_CHARACTERISTIC_UUID "dbeea21d-446e-436c-97b0-0b450b615297"
 
 uint8_t newMACAddress[] = {0x90, 0x84, 0x2B, 0x4A, 0x3A, 0x0A};
 
@@ -34,7 +35,9 @@ BLEServer* pServer;
 BLEAdvertising* pAdvertising;
 BLECharacteristic *pWriteCharacteristic;
 BLECharacteristic *pReadCharacteristic;
-bool receivedData = false;
+BLECharacteristic *pDelayWriteCharacteristic;
+bool receivedComData = false;
+bool receivedDelayData = false;
 String currentData;
 
 
@@ -65,7 +68,14 @@ class RemoteCallback: public BLECharacteristicCallbacks {
       readData += value[i];
     }
     currentData = readData;
-    receivedData = true;
+    if(readData.length() <= 5) {
+      receivedDelayData = true;
+      Serial.print("Dealay (int): ");
+      Serial.println(currentData.toInt());
+    } else {
+      receivedComData = true;
+    }
+    
     //Serial.println(readData);
   }
 };
@@ -108,6 +118,7 @@ void setup()
 
     pWriteCharacteristic = pService->createCharacteristic(WRITE_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
     pReadCharacteristic = pService->createCharacteristic(READ_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ);
+    pDelayWriteCharacteristic = pService->createCharacteristic(DELAY_WRITE_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
     pWriteCharacteristic->setCallbacks(new RemoteCallback());
     pReadCharacteristic->setValue("Hello Wojtek");
 
@@ -143,12 +154,14 @@ void loop()
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();
   }
-  else if(receivedData)
+  else if(receivedComData)
   {
-    receivedData = false;
+    receivedComData = false;
     initCom(currentData);
-  }
-  else if(IF_SERIAL && Serial.available() != 0) {
+  } else if(receivedDelayData) {
+    receivedDelayData = false;
+    DW1000Ranging.setDelay(currentData.toInt());
+  } else if(IF_SERIAL && Serial.available() != 0) {
   if(Serial.available() != 0) {
     String serialString = Serial.readString();
     initCom(serialString);
