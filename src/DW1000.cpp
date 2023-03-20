@@ -2200,7 +2200,7 @@ void DW1000Class::readBytes(byte cmd, uint16_t offset, byte data[], uint16_t n)
 	{
 		data[i] = SPI.transfer(JUNK); // read values
 	}
-	delayMicroseconds(5);
+	delayMicroseconds(1);
 	digitalWrite(_ss, HIGH);
 	SPI.endTransaction();
 }
@@ -2283,7 +2283,7 @@ void DW1000Class::writeBytes(byte cmd, uint16_t offset, byte data[], uint16_t da
 	{
 		SPI.transfer(data[i]); // write values
 	}
-	delayMicroseconds(5);
+	delayMicroseconds(1);
 	digitalWrite(_ss, HIGH);
 	SPI.endTransaction();
 }
