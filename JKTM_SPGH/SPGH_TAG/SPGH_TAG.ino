@@ -39,6 +39,7 @@ BLECharacteristic *pDelayWriteCharacteristic;
 bool receivedComData = false;
 bool receivedDelayData = false;
 String currentData;
+bool anchorIndex = 0;
 
 
 class MyServerCallbacks: public BLEServerCallbacks {
@@ -145,16 +146,13 @@ void initCom(String dataString) {
     dataString.toCharArray(buf, inputLength+1);
     if(DW1000Ranging.decodeInputParams(buf, inputLength)) {
       anchorAddress.clear();
-      anchorAddress = DW1000Ranging.getAnchorAddressesFromSerial();
-      strcpy(anchorAddressChar, anchorAddress.c_str());
+      anchorAddresses = DW1000Ranging.getAnchorAddressesFromSerial();
     }
 }
 
 void loop()
 {
-    DW1000Ranging.loop_tag(anchorAddressChar, pReadCharacteristic);
-    //Serial.println(cycleCount);
-    // DW1000Ranging.loop();
+  DW1000Ranging.loop_tag(anchorAddressChar, pReadCharacteristic);
   if(receivedComData)
   {
     receivedComData = false;

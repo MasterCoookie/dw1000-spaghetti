@@ -647,7 +647,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 						s = std::to_string(curRXPower);
 						bleString += s.c_str();
 						pReadCharacteristic->setValue(bleString.c_str());
-						}
+					}
 
 					
 					/*if(_handleNewRange != 0) {
