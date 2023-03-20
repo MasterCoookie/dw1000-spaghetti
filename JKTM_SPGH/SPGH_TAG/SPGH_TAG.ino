@@ -24,7 +24,7 @@ const uint8_t PIN_IRQ = 34; // irq pin
 const uint8_t PIN_SS = 4;   // spi select pin
 int cycleCount = 9999;
 int limiter = 200;
-std::string anchorAddress;
+std::string anchorAddresses[2];
 char anchorAddressChar[5];
 int numberOfRangingProtocols;
 int serialInputLength = 0;
@@ -145,30 +145,23 @@ void initCom(String dataString) {
     dataString.toCharArray(buf, inputLength+1);
     if(DW1000Ranging.decodeInputParams(buf, inputLength)) {
       anchorAddress.clear();
-      anchorAddress = DW1000Ranging.getAnchorAddressFromSerial();
-      numberOfRangingProtocols = DW1000Ranging.getRangingProtocolNumber();
+      anchorAddress = DW1000Ranging.getAnchorAddressesFromSerial();
       strcpy(anchorAddressChar, anchorAddress.c_str());
-      limiter = numberOfRangingProtocols;
-      cycleCount = 0;
-      DW1000Ranging.setCycleCounter();
     }
 }
 
 void loop()
 {
-  if(cycleCount < limiter) {   
     DW1000Ranging.loop_tag(anchorAddressChar, pReadCharacteristic);
-    cycleCount = DW1000Ranging.getCycleCounter();
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();
-  }
-  else if(receivedComData)
+  if(receivedComData)
   {
     receivedComData = false;
     initCom(currentData);
   } else if(receivedDelayData) {
     receivedDelayData = false;
-    Serial.print("Dealay set (int): ");
+    Serial.print("Delay set (int): ");
     Serial.println(currentData.toInt());
     DW1000Ranging.setDelay(currentData.toInt());
   } else if(IF_SERIAL && Serial.available() != 0) {
