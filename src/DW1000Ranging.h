@@ -218,6 +218,8 @@ private:
 	//17 bytes in SRAM
 	static char  _bias_PRF_64[17]; // TODO remove or use
 
+	static std::string returnedMsg;
+
 	//our things
 	inline static DW1000Device* myStaticAnchor;
 	inline static DW1000Device* myStaticTag;

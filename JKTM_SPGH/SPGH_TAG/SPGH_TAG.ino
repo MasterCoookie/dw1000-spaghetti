@@ -39,8 +39,8 @@ BLECharacteristic *pReadCharacteristic;
 BLECharacteristic *pDelayWriteCharacteristic;
 bool receivedComData = false;
 bool receivedDelayData = false;
-String currentData;
 bool anchorAdressesIndex = 0;
+String currentData;
 
 class MyServerCallbacks: public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) override {

@@ -90,10 +90,11 @@ void DW1000Time::setTimestamp(int64_t value) {
  * @param data timestamp as byte array
  */
 void DW1000Time::setTimestamp(byte data[]) {
-	_timestamp = 0;
-	for(uint8_t i = 0; i < LENGTH_TIMESTAMP; i++) {
-		_timestamp |= ((int64_t)data[i] << (i*8));
-	}
+	// _timestamp = 0;
+	// for(uint8_t i = 0; i < LENGTH_TIMESTAMP; i++) {
+	// 	_timestamp |= ((int64_t)data[i] << (i*8));
+	// }
+	memcpy(&_timestamp, data, sizeof(_timestamp));
 }
 
 /**
@@ -140,10 +141,11 @@ int64_t DW1000Time::getTimestamp() const {
  * @param data var where data should be written
  */
 void DW1000Time::getTimestamp(byte data[]) const {
-	memset(data, 0, LENGTH_TIMESTAMP);
-	for(uint8_t i = 0; i < LENGTH_TIMESTAMP; i++) {
-		data[i] = (byte)((_timestamp >> (i*8)) & 0xFF);
-	}
+	// memset(data, 0, LENGTH_TIMESTAMP);
+	// for(uint8_t i = 0; i < LENGTH_TIMESTAMP; i++) {
+	// 	data[i] = (byte)((_timestamp >> (i*8)) & 0xFF);
+	// }
+	memcpy(data, &_timestamp, sizeof(_timestamp));
 }
 
 /**
