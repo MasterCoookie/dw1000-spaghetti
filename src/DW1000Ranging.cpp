@@ -459,7 +459,7 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 	}
 }
 
-void DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesIndex, BLECharacteristic *pReadCharacteristic) {
+bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesIndex, BLECharacteristic *pReadCharacteristic) {
 	// checkForReset();
 	
 	if(protocolEnd) {
@@ -533,9 +533,10 @@ void DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 				Serial.print("RANGE sent at timestamp: ");
 				myStaticAnchor->timeRangeSent.print();
 			}
-		}		
+		}
+		return true;
 	}
-		timeoutTAG(anchorAdressesIndex);
+	timeoutTAG(anchorAdressesIndex);
 
 	if(_receivedAck) {
 		//TODO check recepient
@@ -558,7 +559,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 					}	
 					beginProtocol();
 					startAsTag(tagAddress, DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
-					return;
+					return true;
 				}
 
 			noteActivity();
@@ -677,8 +678,9 @@ void DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 			}
 			//_receivedAck = false;
 		}
+		return true;
 	}
-	
+	return false;
 }
 
 void DW1000RangingClass::loop_anchor() {

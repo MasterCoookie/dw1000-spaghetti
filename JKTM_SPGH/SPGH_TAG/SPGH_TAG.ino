@@ -153,22 +153,23 @@ void initCom(String dataString) {
 void loop()
 {
   // Serial.println("[APP] Free memory: " + String(esp_get_free_heap_size()) + " bytes");
-    DW1000Ranging.loop_tag(const_cast<char*>(anchorAddresses[anchorAdressesIndex].c_str()), anchorAdressesIndex, pReadCharacteristic);
+  if(!DW1000Ranging.loop_tag(const_cast<char*>(anchorAddresses[anchorAdressesIndex].c_str()), anchorAdressesIndex, pReadCharacteristic)) {
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();
-  if(receivedComData)
-  {
-    receivedComData = false;
-    initCom(currentData);
-  } else if(receivedDelayData) {
-    receivedDelayData = false;
-    Serial.print("Delay set (int): ");
-    Serial.println(currentData.toInt());
-    DW1000Ranging.setDelay(currentData.toInt());
-  } else if(IF_SERIAL && Serial.available() != 0) {
-  if(Serial.available() != 0) {
-    String serialString = Serial.readString();
-    initCom(serialString);
+    if(receivedComData)
+    {
+      receivedComData = false;
+      initCom(currentData);
+    } else if(receivedDelayData) {
+      receivedDelayData = false;
+      Serial.print("Delay set (int): ");
+      Serial.println(currentData.toInt());
+      DW1000Ranging.setDelay(currentData.toInt());
+    } else if(IF_SERIAL && Serial.available() != 0) {
+    if(Serial.available() != 0) {
+      String serialString = Serial.readString();
+      initCom(serialString);
+      }
     }
   }
 }
