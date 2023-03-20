@@ -139,7 +139,7 @@ void setup()
 }
 
 void initCom(String dataString) {
-    inputLength = dataString.length();
+    /*inputLength = dataString.length();
     dataString.trim();
     char buf[inputLength+1];
     dataString.toCharArray(buf, inputLength+1);
@@ -147,12 +147,12 @@ void initCom(String dataString) {
       anchorAddress.clear();
       anchorAddress = DW1000Ranging.getAnchorAddressesFromSerial();
       strcpy(anchorAddressChar, anchorAddress.c_str());
-    }
+    }*/
 }
 
 void loop()
 {
-    DW1000Ranging.loop_tag(anchorAddressChar, pReadCharacteristic);
+   /* DW1000Ranging.loop_tag(anchorAddressChar, pReadCharacteristic);
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();
   if(receivedComData)
@@ -169,7 +169,7 @@ void loop()
     String serialString = Serial.readString();
     initCom(serialString);
     }
-  }
+  }*/
 }
 
 void newRange()

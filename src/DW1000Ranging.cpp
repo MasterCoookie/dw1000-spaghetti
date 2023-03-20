@@ -72,6 +72,8 @@ byte               DW1000RangingClass::destinationAddress[2];
 bool			   DW1000RangingClass::minimalSerialPrint = false;
 int                DW1000RangingClass::rangingProtocolNumber = 0;
 std::string        DW1000RangingClass::anchorAddressFromSerial;
+std::string        DW1000RangingClass::secondAnchorAddress;
+std::string     DW1000RangingClass::anchorAddressTable[2];
 int                DW1000RangingClass::delayAfterCommunication = 150;
 char               DW1000RangingClass::tagAddress[24];
 
@@ -1427,22 +1429,11 @@ bool DW1000RangingClass::decodeInputParams(char inputString[], int inputStringLe
 	}
 	std::string numberOfProtocolsString;
 	for(int i = 5; i < inputStringLength; i++) {
-		numberOfProtocolsString.push_back(inputString[i]);
+		secondAnchorAddress.push_back(inputString[i]);
 	}
-	try {
-		int numberOfProtocols = std::stoi(numberOfProtocolsString);
-		if(DEBUG) {
-			Serial.println(numberOfProtocols);
-		}
-		rangingProtocolNumber = numberOfProtocols;
-		return true;
-	}
-	catch(std::invalid_argument& e) {
-		if(DEBUG) {
-			Serial.println("Parsing failure.");
-		}
-	}
-	return false;
+	anchorAddressTable[0] = anchorAddressFromSerial;
+	anchorAddressTable[1] = secondAnchorAddress;
+	return true;
 }
 
 int DW1000RangingClass::getCycleCounter() {
@@ -1457,8 +1448,8 @@ void DW1000RangingClass::setDelay(int delayAfterCom) {
 	delayAfterCommunication = delayAfterCom;
 }
 
-std::string DW1000RangingClass::getAnchorAddressFromSerial() {
-	return anchorAddressFromSerial;
+std::string * DW1000RangingClass::getAnchorAddressesFromSerial() {
+	return anchorAddressTable;
 }
 
 int DW1000RangingClass::getRangingProtocolNumber() {

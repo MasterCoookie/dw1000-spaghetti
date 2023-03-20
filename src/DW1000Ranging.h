@@ -143,7 +143,7 @@ public:
 	//own Methods
 	static int getCycleCounter();
 	static void setCycleCounter();
-	static std::string getAnchorAddressFromSerial();
+	static std::string * getAnchorAddressesFromSerial();
 	static int getRangingProtocolNumber();
 	static bool decodeInputParams(char inputString[], int inputStringLength);  
 
@@ -173,6 +173,8 @@ private:
 	static int rangingProtocolNumber;
 	//static char anchorAddressFromSerial[6];
 	static std::string anchorAddressFromSerial;
+	static std::string secondAnchorAddress;
+	static std::string anchorAddressTable[2];
 	static int delayAfterCommunication;
 	static char tagAddress[24];
 	
