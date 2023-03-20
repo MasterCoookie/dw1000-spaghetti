@@ -35,6 +35,7 @@
 #include <BLEServer.h>
 
 // messages used in the ranging protocol
+#define NDEBUG
 #define POLL 0
 #define POLL_ACK 1 //RESPONSE
 #define RANGE 2 //FINAL

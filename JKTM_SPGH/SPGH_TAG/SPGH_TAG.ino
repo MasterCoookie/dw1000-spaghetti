@@ -1,3 +1,4 @@
+#define NDEBUG
 #include <SPI.h>
 #include <BLEDevice.h>
 #include <BLEUtils.h>
