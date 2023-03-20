@@ -104,7 +104,7 @@ void setup()
 
     //we start the module as a tag
   
-    DW1000Ranging.initializeVariables(250, 10, true, 20);
+    DW1000Ranging.initializeVariables(250, 10, true, 10);
     DW1000Ranging.startAsTag("BB:CC:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
     //to make it run first time
     DW1000Ranging.setSentAck(true);
@@ -152,6 +152,7 @@ void initCom(String dataString) {
 
 void loop()
 {
+  // Serial.println("[APP] Free memory: " + String(esp_get_free_heap_size()) + " bytes");
     DW1000Ranging.loop_tag(const_cast<char*>(anchorAddresses[anchorAdressesIndex].c_str()), anchorAdressesIndex, pReadCharacteristic);
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();

@@ -133,7 +133,7 @@ public:
 	static void displayShortAddress(byte datas[]);
 	static void beginProtocol();
 	static void initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom);
-	static void timeoutTAG();
+	static void timeoutTAG(bool& anchorAdressesIndex);
 	static void timeoutANCHOR();
 	static void prepareForAnotherRound();
 	

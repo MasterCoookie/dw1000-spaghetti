@@ -374,7 +374,7 @@ void DW1000RangingClass::checkForReset() {
 	}
 }
 
-void DW1000RangingClass::timeoutTAG() {
+void DW1000RangingClass::timeoutTAG(bool& anchorAdressesIndex) {
 	uint32_t curMillis = millis();
 	if(!_sentAck && !_receivedAck) {
 		// check if inactive
@@ -384,6 +384,8 @@ void DW1000RangingClass::timeoutTAG() {
 				ESP.restart();
 			}*/
 			Serial.print("Timed out!|");
+			anchorAdressesIndex = !anchorAdressesIndex;
+			delete myStaticAnchor;
 			Serial.println(_replyDelayTimeUS);
 			++cycleCounter;
 			protocolEnd = true;
@@ -533,7 +535,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 			}
 		}		
 	}
-		timeoutTAG();
+		timeoutTAG(anchorAdressesIndex);
 
 	if(_receivedAck) {
 		//TODO check recepient
@@ -650,6 +652,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 						bleString += s.c_str();
 						pReadCharacteristic->setValue(bleString.c_str());
 						anchorAdressesIndex = !anchorAdressesIndex;
+						delete myStaticAnchor;
 					}
 
 					
@@ -813,6 +816,7 @@ void DW1000RangingClass::loop_anchor() {
 				}
 
 				_expectedMsgId = POLL; //??
+				delete myStaticTag;
 			}	
 		}
 	}
