@@ -109,6 +109,8 @@ public:
 	static void useRangeFilter(boolean enabled);
 	// Used for the smoothing algorithm (Exponential Moving Average). newValue must be >= 2. Default 15.
 	static void setRangeFilterValue(uint16_t newValue);
+
+	static void setDelay(int delayAfterCom);
 	
 	
 	//Handlers:
