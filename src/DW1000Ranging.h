@@ -30,6 +30,9 @@
 #include "DW1000Time.h"
 #include "DW1000Device.h" 
 #include "DW1000Mac.h"
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
 
 // messages used in the ranging protocol
 #define POLL 0
@@ -67,12 +70,14 @@
 #define DEBUG false
 #endif
 
+#define RANDOM_DELAY_TABLE_MODE false
 
 class DW1000RangingClass {
 public:
 	//variables
 	// data buffer
 	static byte data[LEN_DATA];
+	static const int delayTable[335];
 	
 	//initialisation
 	static void    initCommunication(uint8_t myRST = DEFAULT_RST_PIN, uint8_t mySS = DEFAULT_SPI_SS_PIN, uint8_t myIRQ = 2);
@@ -100,10 +105,12 @@ public:
 	static int16_t detectMessageType(byte datas[]); // TODO check return type
 	static void loop();
 	static void loop_anchor();
-	static void loop_tag(char anchor_address[]);
+	static void loop_tag(char anchor_address[], bool &anchorAdressesIndex, BLECharacteristic *pReadCharacteristic = nullptr);
 	static void useRangeFilter(boolean enabled);
 	// Used for the smoothing algorithm (Exponential Moving Average). newValue must be >= 2. Default 15.
 	static void setRangeFilterValue(uint16_t newValue);
+
+	static void setDelay(int delayAfterCom);
 	
 	
 	//Handlers:
@@ -126,7 +133,7 @@ public:
 	static void displayShortAddress(byte datas[]);
 	static void beginProtocol();
 	static void initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom);
-	static void timeoutTAG();
+	static void timeoutTAG(bool& anchorAdressesIndex);
 	static void timeoutANCHOR();
 	static void prepareForAnotherRound();
 	
@@ -136,9 +143,9 @@ public:
 	//own Methods
 	static int getCycleCounter();
 	static void setCycleCounter();
-	static std::string getAnchorAddressFromSerial();
+	static std::string * getAnchorAddressesFromSerial();
 	static int getRangingProtocolNumber();
-	static bool decodeSerial(char serialString[], int serialInputLength);  
+	static bool decodeInputParams(char inputString[], int inputStringLength);  
 
 private:
 	//other devices in the network
@@ -166,6 +173,8 @@ private:
 	static int rangingProtocolNumber;
 	//static char anchorAddressFromSerial[6];
 	static std::string anchorAddressFromSerial;
+	static std::string secondAnchorAddress;
+	static std::string anchorAddressTable[2];
 	static int delayAfterCommunication;
 	static char tagAddress[24];
 	
