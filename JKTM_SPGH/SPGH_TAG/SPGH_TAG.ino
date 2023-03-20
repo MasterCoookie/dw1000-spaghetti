@@ -24,7 +24,7 @@ const uint8_t PIN_IRQ = 34; // irq pin
 const uint8_t PIN_SS = 4;   // spi select pin
 int cycleCount = 9999;
 int limiter = 200;
-std::string anchorAddresses[2];
+std::string* anchorAddresses = new std::string[2];
 char anchorAddressChar[5];
 int numberOfRangingProtocols;
 int serialInputLength = 0;
@@ -39,7 +39,7 @@ BLECharacteristic *pDelayWriteCharacteristic;
 bool receivedComData = false;
 bool receivedDelayData = false;
 String currentData;
-
+bool anchorAdressesIndex = 0;
 
 class MyServerCallbacks: public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) override {
@@ -144,15 +144,15 @@ void initCom(String dataString) {
     char buf[inputLength+1];
     dataString.toCharArray(buf, inputLength+1);
     if(DW1000Ranging.decodeInputParams(buf, inputLength)) {
-      anchorAddress.clear();
-      anchorAddress = DW1000Ranging.getAnchorAddressesFromSerial();
-      strcpy(anchorAddressChar, anchorAddress.c_str());
+      // anchorAddresses[0].clear();
+      // anchorAddresses[1].clear();
+      anchorAddresses = DW1000Ranging.getAnchorAddressesFromSerial();
     }
 }
 
 void loop()
 {
-    DW1000Ranging.loop_tag(anchorAddressChar, pReadCharacteristic);
+    DW1000Ranging.loop_tag(const_cast<char*>(anchorAddresses[anchorAdressesIndex].c_str()), anchorAdressesIndex, pReadCharacteristic);
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();
   if(receivedComData)

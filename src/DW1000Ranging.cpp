@@ -457,7 +457,7 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 	}
 }
 
-void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pReadCharacteristic) {
+void DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesIndex, BLECharacteristic *pReadCharacteristic) {
 	// checkForReset();
 	
 	if(protocolEnd) {
@@ -649,6 +649,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 						s = std::to_string(curRXPower);
 						bleString += s.c_str();
 						pReadCharacteristic->setValue(bleString.c_str());
+						anchorAdressesIndex = !anchorAdressesIndex;
 					}
 
 					
