@@ -64,20 +64,27 @@ class RemoteCallback: public BLECharacteristicCallbacks {
 */
     String readData;
     for (int i = 0; i < value.length(); i++) {
-      // Serial.print(value[i]);
+      Serial.print(value[i]);
       readData += value[i];
     }
     currentData = readData;
-    if(readData.length() <= 5) {
-      receivedDelayData = true;
-      Serial.print("Dealay (int): ");
-      Serial.println(currentData.toInt());
-    } else {
-      receivedComData = true;
-    }
-    
+    receivedComData = true;    
     //Serial.println(readData);
   }
+};
+
+class RemoteDelayCallback: public BLECharacteristicCallbacks {
+  public:
+    void onWrite(BLECharacteristic *pCharacteristic) override {
+      std::string value = pCharacteristic->getValue();
+      String readData;
+      for (int i = 0; i < value.length(); i++) {
+        Serial.print(value[i]);
+        readData += value[i];
+      }
+      currentData = readData;
+      receivedDelayData = true;
+    }
 };
 
 void setup()
@@ -98,7 +105,7 @@ void setup()
     //we start the module as a tag
   
     DW1000Ranging.initializeVariables(250, 10, true, 20);
-    DW1000Ranging.startAsTag("FF:02:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+    DW1000Ranging.startAsTag("BB:CC:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
     //to make it run first time
     DW1000Ranging.setSentAck(true);
     DW1000Ranging.beginProtocol();
@@ -107,7 +114,7 @@ void setup()
     
     //starting BLE
     Serial.println("Initializing BLE");
-    std::string BLEID = "SPGH-TAG-DEV1";
+    std::string BLEID = "SPGH-TAG-DEV420";
     esp_base_mac_addr_set(&newMACAddress[0]);
     BLEDevice::init(BLEID);
     Serial.println(BLEID.c_str());
@@ -121,6 +128,7 @@ void setup()
     pDelayWriteCharacteristic = pService->createCharacteristic(DELAY_WRITE_CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE);
     pWriteCharacteristic->setCallbacks(new RemoteCallback());
     pReadCharacteristic->setValue("Hello Wojtek");
+    pDelayWriteCharacteristic->setCallbacks(new RemoteDelayCallback());
 
     pService->start();
 
@@ -160,6 +168,8 @@ void loop()
     initCom(currentData);
   } else if(receivedDelayData) {
     receivedDelayData = false;
+    Serial.print("Dealay set (int): ");
+    Serial.println(currentData.toInt());
     DW1000Ranging.setDelay(currentData.toInt());
   } else if(IF_SERIAL && Serial.available() != 0) {
   if(Serial.available() != 0) {
