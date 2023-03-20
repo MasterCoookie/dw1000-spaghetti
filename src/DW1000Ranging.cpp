@@ -1453,6 +1453,10 @@ void DW1000RangingClass::setCycleCounter() {
 	cycleCounter = 0;
 }
 
+void DW1000RangingClass::setDelay(int delayAfterCom) {
+	delayAfterCommunication = delayAfterCom;
+}
+
 std::string DW1000RangingClass::getAnchorAddressFromSerial() {
 	return anchorAddressFromSerial;
 }
