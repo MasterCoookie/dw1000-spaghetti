@@ -644,6 +644,9 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 							Serial.println(returnedMsg.c_str());
 							returnedMsg = "";
 						}
+						else {
+							returnedMsg += "_";
+						}
 						
 						char addrString[60];
 						sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
