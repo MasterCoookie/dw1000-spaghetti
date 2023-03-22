@@ -595,8 +595,6 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 			}
 			// expect REPORT
 			else if(_expectedMsgId == RANGE_REPORT) {
-				//_receivedAck = false;
-				//detect data type 
 				//DW1000.getData(data, LEN_DATA);
 				
 				if(DEBUG) {
@@ -664,17 +662,7 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 						delete myStaticAnchor;
 					}
 
-					
-					/*if(_handleNewRange != 0) {
-						(*_handleNewRange)();
-					}*/
-					//prepare for another round
-					
-					//DW1000RangingClass::initProtocol=true;
-					//resets protocol to deafult settings
-					//beginProtocol();
-				    
-					//wait for 250ms	
+
 					currentTimeStamp = millis();
 					protocolEnd = true;
 				}
@@ -684,7 +672,6 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 			if(DEBUG) {
 				Serial.println("Incorrect message recipient. Ignoring request.");
 			}
-			//_receivedAck = false;
 		}
 		return true;
 	}
@@ -1089,8 +1076,6 @@ void DW1000RangingClass::loop() {
 							else {
 								transmitRangeFailed(myDistantDevice);
 							}
-							
-							
 							return;
 						}
 						
