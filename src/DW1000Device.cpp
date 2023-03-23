@@ -66,13 +66,13 @@ void DW1000Device::setShortAddress(byte deviceAddress[]) {
 }
 
 
-void DW1000Device::setRange(float range) { _range = round(range*100); }
+void DW1000Device::setRange(float range) { _range = roundf(range*100); }
 
-void DW1000Device::setRXPower(float RXPower) { _RXPower = round(RXPower*100); }
+void DW1000Device::setRXPower(float RXPower) { _RXPower = roundf(RXPower*100); }
 
-void DW1000Device::setFPPower(float FPPower) { _FPPower = round(FPPower*100); }
+void DW1000Device::setFPPower(float FPPower) { _FPPower = roundf(FPPower*100); }
 
-void DW1000Device::setQuality(float quality) { _quality = round(quality*100); }
+void DW1000Device::setQuality(float quality) { _quality = roundf(quality*100); }
 
 
 byte* DW1000Device::getByteAddress() {
