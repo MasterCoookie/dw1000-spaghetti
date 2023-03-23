@@ -91,6 +91,7 @@ uint32_t  DW1000RangingClass::_lastActivity;
 uint32_t  DW1000RangingClass::_resetPeriod;
 uint32_t  DW1000RangingClass::timeoutPeriod = 400;
 
+
 // reply times (same on both sides for symm. ranging)
 uint16_t  DW1000RangingClass::_replyDelayTimeUS;
 //timer delay
@@ -384,10 +385,31 @@ void DW1000RangingClass::timeoutTAG(bool& anchorAdressesIndex) {
 			{
 				ESP.restart();
 			}*/
-			Serial.print("Timed out!|");
+			// Serial.println("Timed out!");
+			if(anchorAdressesIndex) {
+				returnedMsg += "_";
+				char addrString[60];
+				sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
+				returnedMsg += addrString;
+				for(int i=0; i < 5; i++) {
+					returnedMsg += tagAddress[i];
+				}
+
+				returnedMsg += "|Timed out!";	
+			}
+			else {
+				Serial.println(returnedMsg.c_str());
+				returnedMsg = "";
+				char addrString[60];
+				sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
+				returnedMsg += addrString;
+				for(int i=0; i < 5; i++) {
+					returnedMsg += tagAddress[i];
+				}
+				returnedMsg += "|Timed out!";
+			}
 			anchorAdressesIndex = !anchorAdressesIndex;
 			delete myStaticAnchor;
-			Serial.println(_replyDelayTimeUS);
 			++cycleCounter;
 			protocolEnd = true;
 			//todo start as tag with the same address
