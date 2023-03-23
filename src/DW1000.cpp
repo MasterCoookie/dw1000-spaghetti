@@ -2102,7 +2102,7 @@ void DW1000Class::setBit(byte data[], uint16_t n, uint16_t bit, boolean val)
 	uint16_t idx;
 	uint8_t shift;
 
-	idx = bit / 8;
+	idx = bit>>3;
 	if (idx >= n)
 	{
 		return; // TODO proper error handling: out of bounds
@@ -2134,7 +2134,7 @@ boolean DW1000Class::getBit(byte data[], uint16_t n, uint16_t bit)
 	uint16_t idx;
 	uint8_t shift;
 
-	idx = bit / 8;
+	idx = bit>>3;
 	if (idx >= n)
 	{
 		return false; // TODO proper error handling: out of bounds
