@@ -558,11 +558,12 @@ bool DW1000RangingClass::loop_tag(char anchor_address_a[], char anchor_address_b
 		if(messageType == POLL) {
 			DW1000Time timePollSent;
 			DW1000.getTransmitTimestamp(timePollSent);
-			myStaticAnchor->timePollSent = timePollSent;
+			myStaticAnchorA->timePollSent = timePollSent;
+			myStaticAnchorB->timePollSent = timePollSent;
 
 			if(DEBUG) {
 				Serial.print("POLL sent at timestamp: ");
-				myStaticAnchor->timePollSent.print();
+				myStaticAnchorA->timePollSent.print();
 			}
 		} else if(messageType == RANGE) {
 			DW1000Time timeRangeSent;
@@ -758,14 +759,55 @@ void DW1000RangingClass::loop_anchor() {
 			Serial.print("Decoded address: ");
 			displayShortAddress(destenation_address_short_byte);
 		}
-		
-		if(destenation_address_short_byte[0] == _currentShortAddress[0] && destenation_address_short_byte[1] == _currentShortAddress[1]){
+
+		int messageType = detectMessageType(data);
+
+		//exepect POLL
+		if(messageType == POLL) {
+			byte tag_address_short_byte[2];
+			_globalMac.decodeShortMACFrame(data, tag_address_short_byte); //USED TO GET SENDER ADDRESS
+			if(DEBUG) {
+				Serial.print("POLL received");
+			}
+			
+			//TODO - save address as next FINAL recepient
+			myStaticTag = new DW1000Device(tag_address_short_byte, true);
+			// myStaticTag->setReplyTime(DEFAULT_REPLY_DELAY_TIME);
+
+			_expectedMsgId = RANGE;
+
+			uint16_t replyTime;
+
+			//TMP
+			memcpy(&replyTime, data+SHORT_MAC_LEN+2, 2);
+			// replyTime = DEFAULT_REPLY_DELAY_TIME;
+			Serial.println(replyTime);
+
+			//we configure our replyTime;
+			if(DEBUG) {
+				Serial.print("Reply time: ");
+				Serial.println(replyTime);
+			}
+			
+			_replyDelayTimeUS = replyTime;
+
+			DW1000.getReceiveTimestamp(myStaticTag->timePollReceived);
+			transmitPollAck(myStaticTag);
+			noteActivity();
+
+			if(DEBUG) {
+				Serial.print(" at timestamp: ");
+				myStaticTag->timePollReceived.print();
+				Serial.println("Sending POLL_ACK");
+			}
+
+		} else if(destenation_address_short_byte[0] == _currentShortAddress[0] && destenation_address_short_byte[1] == _currentShortAddress[1]){
 			noteActivity();
 			if(DEBUG) {
 				Serial.println("self address matched!");
 			}
 
-			int messageType = detectMessageType(data);
+			
 			//TODO - reset protocole
 			if(messageType != _expectedMsgId) {
 				if(DEBUG) {
@@ -780,45 +822,7 @@ void DW1000RangingClass::loop_anchor() {
 			}
 
 			
-			//exepect POLL
-			if(messageType == POLL) {
-				if(DEBUG) {
-					Serial.print("POLL received");
-				}
-				byte tag_address_short_byte[2];
-				_globalMac.decodeShortMACFrame(data, tag_address_short_byte);
-				//TODO - save address as next FINAL recepient
-				myStaticTag = new DW1000Device(tag_address_short_byte, true);
-				// myStaticTag->setReplyTime(DEFAULT_REPLY_DELAY_TIME);
-
-				_expectedMsgId = RANGE;
-
-				uint16_t replyTime;
-
-				//TMP
-				memcpy(&replyTime, data+SHORT_MAC_LEN+2, 2);
-				// replyTime = DEFAULT_REPLY_DELAY_TIME;
-				Serial.println(replyTime);
-
-				//we configure our replyTime;
-				if(DEBUG) {
-					Serial.print("Reply time: ");
-					Serial.println(replyTime);
-				}
-				
-				_replyDelayTimeUS = replyTime;
-
-				DW1000.getReceiveTimestamp(myStaticTag->timePollReceived);
-				transmitPollAck(myStaticTag);
-				noteActivity();
-
-				if(DEBUG) {
-					Serial.print(" at timestamp: ");
-					myStaticTag->timePollReceived.print();
-					Serial.println("Sending POLL_ACK");
-				}
-
-			} else if(messageType == RANGE) {
+			 if(messageType == RANGE) {
 				if(DEBUG) {
 					Serial.println("RANGE RECIEVED");
 				}
