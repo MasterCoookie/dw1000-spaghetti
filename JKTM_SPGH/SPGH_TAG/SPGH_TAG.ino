@@ -154,7 +154,7 @@ void initCom(String dataString) {
 void loop()
 {
   // Serial.println("[APP] Free memory: " + String(esp_get_free_heap_size()) + " bytes");
-  if(!DW1000Ranging.loop_tag(const_cast<char*>(anchorAddresses[anchorAdressesIndex].c_str()), anchorAdressesIndex, pReadCharacteristic)) {
+  if(!DW1000Ranging.loop_tag(const_cast<char*>(anchorAddresses[0].c_str()), const_cast<char*>(anchorAddresses[1].c_str()), pReadCharacteristic)) {
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();
     if(receivedComData)

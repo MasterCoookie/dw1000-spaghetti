@@ -68,7 +68,8 @@ uint32_t           DW1000RangingClass::currentTimeStamp = 0;
 bool               DW1000RangingClass::protocolEnd = false;
 int 			   DW1000RangingClass::timeOutCounter = 0;
 int 			   DW1000RangingClass::timeOutResetCount = 10;
-byte               DW1000RangingClass::destinationAddress[2];
+byte               DW1000RangingClass::destinationAddressA[2];
+byte               DW1000RangingClass::destinationAddressB[2];
 bool			   DW1000RangingClass::minimalSerialPrint = false;
 int                DW1000RangingClass::rangingProtocolNumber = 0;
 std::string        DW1000RangingClass::anchorAddressFromSerial;
@@ -482,7 +483,7 @@ int16_t DW1000RangingClass::detectMessageType(byte datas[]) {
 	}
 }
 
-bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesIndex, BLECharacteristic *pReadCharacteristic) {
+bool DW1000RangingClass::loop_tag(char anchor_address_a[], char anchor_address_b[], BLECharacteristic *pReadCharacteristic) {
 	// checkForReset();
 	
 	if(protocolEnd) {
@@ -491,7 +492,8 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 	
 	if(DW1000RangingClass::initProtocol) {
 		DW1000RangingClass::initProtocol = false;
-		byte anchor_address_byte[8];
+		byte anchor_address_byte_a[8];
+		byte anchor_address_byte_b[8];
 		if(RANDOM_DELAY_TABLE_MODE) {
 			uint32_t randomNumber = esp_random();
 			randomNumber = std::pow(randomNumber, 1/3.);
@@ -508,19 +510,32 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 			_replyDelayTimeUS = DEFAULT_REPLY_DELAY_TIME;
 		}
 
-		byte anchor_address_short_byte[2];
-		anchor_address_short_byte[0] = anchor_address_byte[0];
-		anchor_address_short_byte[1] = anchor_address_byte[1];
-		destinationAddress[0] = anchor_address_short_byte[0];
-		destinationAddress[1] = anchor_address_short_byte[1];
+		byte anchor_address_short_byte_a[2];
+		byte anchor_address_short_byte_b[2];
 
+		anchor_address_short_byte_a[0] = anchor_address_byte_a[0];
+		anchor_address_short_byte_a[1] = anchor_address_byte_a[1];
+
+		anchor_address_short_byte_b[0] = anchor_address_b[0];
+		anchor_address_short_byte_b[1] = anchor_address_b[1];
+
+		destinationAddressA[0] = anchor_address_short_byte_a[0];
+		destinationAddressA[1] = anchor_address_short_byte_a[1];
+
+		destinationAddressB[0] = anchor_address_short_byte_b[0];
+		destinationAddressB[1] = anchor_address_short_byte_b[1];
+
+		myStaticAnchorA = new DW1000Device(anchor_address_byte_a, anchor_address_short_byte_a);
+		myStaticAnchorB = new DW1000Device(anchor_address_byte_b, anchor_address_short_byte_b);
+
+		transmitPollBroadcast();
 
 		// myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
-		// myStaticAnchor->setReplyTime(_replyDelayTimeUS);
+		// myStaticAnchor->setReplyTime(_replyDelayTimeUS); -> do this after recieving randmized delay time from anchor
 		// transmitPoll(myStaticAnchor);
 		// noteActivity();
 
-		
+
 		_expectedMsgId = POLL_ACK;
 	}
 	
