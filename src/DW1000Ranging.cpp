@@ -425,6 +425,7 @@ void DW1000RangingClass::resetAnchor()
 		Serial.println("resetAnchor initiated.");
 	}
 	_expectedMsgId = POLL;
+	delete myStaticTag; //remove if couses problems
 	noteActivity();
 }
 
