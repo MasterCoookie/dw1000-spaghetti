@@ -385,6 +385,7 @@ void DW1000RangingClass::timeoutTAG() {
 			Serial.println(_replyDelayTimeUS);
 			++cycleCounter;
 			protocolEnd = true;
+			delete myStaticAnchor;
 			//todo start as tag with the same address
 			startAsTag(tagAddress, DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
 			beginProtocol();
@@ -409,7 +410,7 @@ void DW1000RangingClass::timeoutANCHOR() {
 		// check if inactive
 		if(curMillis-_lastActivity > _resetPeriod) {
 			if(DEBUG) {
-			Serial.println("timeout reset");
+				Serial.println("timeout reset");
 			}
 			resetAnchor();
 			// receiver();
@@ -647,6 +648,7 @@ void DW1000RangingClass::loop_tag(char anchor_address[], BLECharacteristic *pRea
 						s = std::to_string(curRXPower);
 						bleString += s.c_str();
 						pReadCharacteristic->setValue(bleString.c_str());
+						delete myStaticAnchor;
 						}
 
 					
@@ -810,6 +812,7 @@ void DW1000RangingClass::loop_anchor() {
 				}
 
 				_expectedMsgId = POLL; //??
+				delete myStaticTag;
 			}	
 		}
 	}
