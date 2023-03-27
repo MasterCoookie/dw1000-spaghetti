@@ -222,7 +222,8 @@ private:
 	static std::string returnedMsg;
 
 	//our things
-	inline static DW1000Device* myStaticAnchor;
+	inline static DW1000Device* myStaticAnchorA;
+	inline static DW1000Device* myStaticAnchorB;
 	inline static DW1000Device* myStaticTag;
 	inline static bool initProtocol;
 	
@@ -254,6 +255,8 @@ private:
 	//for ranging protocole (TAG)
 	static void transmitPoll(DW1000Device* myDistantDevice);
 	static void transmitRange(DW1000Device* myDistantDevice);
+
+	static void transmitPollBroadcast();
 	
 	//methods for range computation
 	static void computeRangeAsymmetric(DW1000Device* myDistantDevice, DW1000Time* myTOF);

@@ -515,10 +515,12 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 		destinationAddress[1] = anchor_address_short_byte[1];
 
 
-		myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
-		myStaticAnchor->setReplyTime(_replyDelayTimeUS);
-		transmitPoll(myStaticAnchor);
-		noteActivity();
+		// myStaticAnchor = new DW1000Device(anchor_address_byte, anchor_address_short_byte);
+		// myStaticAnchor->setReplyTime(_replyDelayTimeUS);
+		// transmitPoll(myStaticAnchor);
+		// noteActivity();
+
+		
 		_expectedMsgId = POLL_ACK;
 	}
 	
@@ -1334,6 +1336,20 @@ void DW1000RangingClass::transmitPoll(DW1000Device* myDistantDevice) {
 		copyShortAddress(_lastSentToShortAddress, myDistantDevice->getByteShortAddress());
 	}
 	
+	transmit(data);
+}
+
+static void transmitPollBroadcast() {
+	transmitInit();
+	_timerDelay = DEFAULT_TIMER_DELAY;
+
+	byte shortBroadcast[2] = {0xFF, 0xFF};
+	_globalMac.generateShortMACFrame(data, _currentShortAddress, shortBroadcast);
+	data[SHORT_MAC_LEN] = POLL;
+
+	uint16_t replyTime = DEFAULT_REPLY_DELAY_TIME;
+	memcpy(data+SHORT_MAC_LEN+2, &replyTime, sizeof(uint16_t));
+
 	transmit(data);
 }
 
