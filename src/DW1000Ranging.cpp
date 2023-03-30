@@ -663,6 +663,7 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 						if(!anchorAdressesIndex) {
 							Serial.println(returnedMsg.c_str());
 							returnedMsg = "";
+							isMeasuring = false;
 						}
 						else {
 							returnedMsg += "_";

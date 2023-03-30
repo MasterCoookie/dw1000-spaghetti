@@ -137,6 +137,7 @@ public:
 	static void timeoutTAG(bool& anchorAdressesIndex);
 	static void timeoutANCHOR();
 	static void prepareForAnotherRound();
+	static bool isMeasuring;
 	
 	
 
@@ -159,6 +160,9 @@ private:
 	static DW1000Mac    _globalMac;
 	static int32_t      timer;
 	static int16_t      counterForBlink;
+	
+
+	
   
 
 	
