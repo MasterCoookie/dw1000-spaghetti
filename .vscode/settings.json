@@ -3,6 +3,7 @@
         "*.ejs": "html",
         "cstring": "cpp",
         "cstddef": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "xstring": "cpp"
     }
 }

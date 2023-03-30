@@ -80,7 +80,7 @@ class RemoteDelayCallback: public BLECharacteristicCallbacks {
       std::string value = pCharacteristic->getValue();
       String readData;
       for (int i = 0; i < value.length(); i++) {
-        Serial.print(value[i]);
+        //Serial.print(value[i]);
         readData += value[i];
       }
       currentData = readData;
@@ -145,8 +145,8 @@ void initCom(String dataString) {
     char buf[inputLength+1];
     dataString.toCharArray(buf, inputLength+1);
     if(DW1000Ranging.decodeInputParams(buf, inputLength)) {
-      // anchorAddresses[0].clear();
-      // anchorAddresses[1].clear();
+      anchorAddresses[0].clear();
+      anchorAddresses[1].clear();
       anchorAddresses = DW1000Ranging.getAnchorAddressesFromSerial();
     }
 }
@@ -154,10 +154,13 @@ void initCom(String dataString) {
 void loop()
 {
   // Serial.println("[APP] Free memory: " + String(esp_get_free_heap_size()) + " bytes");
-  if(!DW1000Ranging.loop_tag(const_cast<char*>(anchorAddresses[anchorAdressesIndex].c_str()), anchorAdressesIndex, pReadCharacteristic) && !DW1000Ranging.isMeasuring) {
+    DW1000Ranging.loop_tag(const_cast<char*>(anchorAddresses[anchorAdressesIndex].c_str()), anchorAdressesIndex, pReadCharacteristic);
+    //Serial.print("isMeasunring: ");
+    //Serial.println(DW1000Ranging.isMeasuring);
+    
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();
-    if(receivedComData)
+    if(receivedComData && !DW1000Ranging.isMeasuring)
     {
       receivedComData = false;
       initCom(currentData);
@@ -172,7 +175,6 @@ void loop()
       initCom(serialString);
       }
     }
-  }
 }
 
 void newRange()
