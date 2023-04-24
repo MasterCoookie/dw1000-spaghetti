@@ -1,3 +1,4 @@
+#define NDEBUG
 #include <SPI.h>
 #include <BLEDevice.h>
 #include <BLEUtils.h>
@@ -38,8 +39,8 @@ BLECharacteristic *pReadCharacteristic;
 BLECharacteristic *pDelayWriteCharacteristic;
 bool receivedComData = false;
 bool receivedDelayData = false;
-String currentData;
 bool anchorAdressesIndex = 0;
+String currentData;
 
 class MyServerCallbacks: public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) override {
@@ -79,7 +80,7 @@ class RemoteDelayCallback: public BLECharacteristicCallbacks {
       std::string value = pCharacteristic->getValue();
       String readData;
       for (int i = 0; i < value.length(); i++) {
-        Serial.print(value[i]);
+        //Serial.print(value[i]);
         readData += value[i];
       }
       currentData = readData;
@@ -105,7 +106,7 @@ void setup()
     //we start the module as a tag
   
     DW1000Ranging.initializeVariables(250, 10, true, 10);
-    DW1000Ranging.startAsTag("BB:CC:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+    DW1000Ranging.startAsTag("AA:AA:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
     //to make it run first time
     DW1000Ranging.setSentAck(true);
     DW1000Ranging.beginProtocol();
@@ -144,8 +145,8 @@ void initCom(String dataString) {
     char buf[inputLength+1];
     dataString.toCharArray(buf, inputLength+1);
     if(DW1000Ranging.decodeInputParams(buf, inputLength)) {
-      // anchorAddresses[0].clear();
-      // anchorAddresses[1].clear();
+      anchorAddresses[0].clear();
+      anchorAddresses[1].clear();
       anchorAddresses = DW1000Ranging.getAnchorAddressesFromSerial();
     }
 }
@@ -154,23 +155,26 @@ void loop()
 {
   // Serial.println("[APP] Free memory: " + String(esp_get_free_heap_size()) + " bytes");
     DW1000Ranging.loop_tag(const_cast<char*>(anchorAddresses[anchorAdressesIndex].c_str()), anchorAdressesIndex, pReadCharacteristic);
+    //Serial.print("isMeasunring: ");
+    //Serial.println(DW1000Ranging.isMeasuring);
+    
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();
-  if(receivedComData)
-  {
-    receivedComData = false;
-    initCom(currentData);
-  } else if(receivedDelayData) {
-    receivedDelayData = false;
-    Serial.print("Delay set (int): ");
-    Serial.println(currentData.toInt());
-    DW1000Ranging.setDelay(currentData.toInt());
-  } else if(IF_SERIAL && Serial.available() != 0) {
-  if(Serial.available() != 0) {
-    String serialString = Serial.readString();
-    initCom(serialString);
+    if(receivedComData && !DW1000Ranging.isMeasuring)
+    {
+      receivedComData = false;
+      initCom(currentData);
+    } else if(receivedDelayData) {
+      receivedDelayData = false;
+      Serial.print("Delay set (int): ");
+      Serial.println(currentData.toInt());
+      DW1000Ranging.setDelay(currentData.toInt());
+    } else if(IF_SERIAL && Serial.available() != 0) {
+    if(Serial.available() != 0) {
+      String serialString = Serial.readString();
+      initCom(serialString);
+      }
     }
-  }
 }
 
 void newRange()

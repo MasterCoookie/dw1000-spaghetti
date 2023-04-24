@@ -94,6 +94,7 @@ void DW1000Time::setTimestamp(byte data[]) {
 	for(uint8_t i = 0; i < LENGTH_TIMESTAMP; i++) {
 		_timestamp |= ((int64_t)data[i] << (i*8));
 	}
+	// memcpy(&_timestamp, data, sizeof(_timestamp));
 }
 
 /**
@@ -144,6 +145,7 @@ void DW1000Time::getTimestamp(byte data[]) const {
 	for(uint8_t i = 0; i < LENGTH_TIMESTAMP; i++) {
 		data[i] = (byte)((_timestamp >> (i*8)) & 0xFF);
 	}
+	// memcpy(data, &_timestamp, sizeof(_timestamp));
 }
 
 /**

@@ -35,6 +35,7 @@
 #include <BLEServer.h>
 
 // messages used in the ranging protocol
+#define NDEBUG
 #define POLL 0
 #define POLL_ACK 1 //RESPONSE
 #define RANGE 2 //FINAL
@@ -70,7 +71,7 @@
 #define DEBUG false
 #endif
 
-#define RANDOM_DELAY_TABLE_MODE false
+#define RANDOM_DELAY_TABLE_MODE true
 
 class DW1000RangingClass {
 public:
@@ -105,7 +106,7 @@ public:
 	static int16_t detectMessageType(byte datas[]); // TODO check return type
 	static void loop();
 	static void loop_anchor();
-	static void loop_tag(char anchor_address[], bool &anchorAdressesIndex, BLECharacteristic *pReadCharacteristic = nullptr);
+	static bool loop_tag(char anchor_address[], bool &anchorAdressesIndex, BLECharacteristic *pReadCharacteristic = nullptr);
 	static void useRangeFilter(boolean enabled);
 	// Used for the smoothing algorithm (Exponential Moving Average). newValue must be >= 2. Default 15.
 	static void setRangeFilterValue(uint16_t newValue);
@@ -136,6 +137,7 @@ public:
 	static void timeoutTAG(bool& anchorAdressesIndex);
 	static void timeoutANCHOR();
 	static void prepareForAnotherRound();
+	static bool isMeasuring;
 	
 	
 
@@ -158,6 +160,10 @@ private:
 	static DW1000Mac    _globalMac;
 	static int32_t      timer;
 	static int16_t      counterForBlink;
+	
+
+	
+  
 
 	
 	
@@ -216,6 +222,8 @@ private:
 	static int16_t _bias_PRF_16[17]; // TODO remove or use
 	//17 bytes in SRAM
 	static char  _bias_PRF_64[17]; // TODO remove or use
+
+	static std::string returnedMsg;
 
 	//our things
 	inline static DW1000Device* myStaticAnchor;
