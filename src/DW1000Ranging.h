@@ -105,7 +105,7 @@ public:
 	//ranging functions
 	static int16_t detectMessageType(byte datas[]); // TODO check return type
 	static void loop();
-	static void loop_anchor();
+	static bool loop_anchor(char anchor_address[], bool &anchorAdressesIndex, BLECharacteristic *pReadCharacteristic = nullptr);
 	static bool loop_tag(char anchor_address[], bool &anchorAdressesIndex, BLECharacteristic *pReadCharacteristic = nullptr);
 	static void useRangeFilter(boolean enabled);
 	// Used for the smoothing algorithm (Exponential Moving Average). newValue must be >= 2. Default 15.
@@ -138,6 +138,8 @@ public:
 	static void timeoutANCHOR();
 	static void prepareForAnotherRound();
 	static bool isMeasuring;
+	static bool changeMode;
+	static bool tagMode;
 	
 	
 
@@ -148,6 +150,8 @@ public:
 	static std::string * getAnchorAddressesFromSerial();
 	static int getRangingProtocolNumber();
 	static bool decodeInputParams(char inputString[], int inputStringLength);  
+	static bool getChangeMode();
+	static bool getTagMode();
 
 private:
 	//other devices in the network

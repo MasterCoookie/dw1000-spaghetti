@@ -3,6 +3,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
+#include <EEPROM.h>
 #include "DW1000Ranging.h"
 
 #define SPI_SCK 18
@@ -30,6 +31,7 @@ char anchorAddressChar[5];
 int numberOfRangingProtocols;
 int serialInputLength = 0;
 int inputLength = 0;
+bool (*func)(char[], bool&, BLECharacteristic*);
 
 bool deviceConnected = false;
 BLEServer* pServer;
@@ -91,6 +93,7 @@ class RemoteDelayCallback: public BLECharacteristicCallbacks {
 void setup()
 {
     Serial.begin(115200);
+    EEPROM.begin(512);
     delay(1000);
     Serial.println("Initializing DW1000");
     //init the configuration
@@ -102,11 +105,18 @@ void setup()
     DW1000Ranging.attachInactiveDevice(inactiveDevice);
     //Enable the filter to smooth the distance
     //DW1000Ranging.useRangeFilter(true);
-
     //we start the module as a tag
+
   
     DW1000Ranging.initializeVariables(250, 10, true, 10);
-    DW1000Ranging.startAsTag("AA:AA:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+    if(DW1000Ranging.getTagMode()) {
+      DW1000Ranging.startAsTag("DD:BB:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+      func = DW1000Ranging.loop_tag;
+    }
+    else {
+      DW1000Ranging.startAsAnchor("DD:BB:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+      func = DW1000Ranging.loop_anchor;
+    }
     //to make it run first time
     DW1000Ranging.setSentAck(true);
     DW1000Ranging.beginProtocol();
@@ -115,7 +125,7 @@ void setup()
     
     //starting BLE
     Serial.println("Initializing BLE");
-    std::string BLEID = "SPGH-TAG-DEV420";
+    std::string BLEID = "SPGH-DEVICE-DEV1";
     esp_base_mac_addr_set(&newMACAddress[0]);
     BLEDevice::init(BLEID);
     Serial.println(BLEID.c_str());
@@ -154,7 +164,7 @@ void initCom(String dataString) {
 void loop()
 {
   // Serial.println("[APP] Free memory: " + String(esp_get_free_heap_size()) + " bytes");
-    DW1000Ranging.loop_tag(const_cast<char*>(anchorAddresses[anchorAdressesIndex].c_str()), anchorAdressesIndex, pReadCharacteristic);
+    func(const_cast<char*>(anchorAddresses[anchorAdressesIndex].c_str()), anchorAdressesIndex, pReadCharacteristic);
     //Serial.print("isMeasunring: ");
     //Serial.println(DW1000Ranging.isMeasuring);
     
