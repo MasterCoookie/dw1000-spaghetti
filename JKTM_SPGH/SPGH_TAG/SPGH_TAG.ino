@@ -110,11 +110,11 @@ void setup()
   
     DW1000Ranging.initializeVariables(250, 10, true, 10);
     if(DW1000Ranging.getTagMode()) {
-      DW1000Ranging.startAsTag("DD:BB:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+      DW1000Ranging.startAsTag("BB:BB:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
       func = DW1000Ranging.loop_tag;
     }
     else {
-      DW1000Ranging.startAsAnchor("DD:BB:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+      DW1000Ranging.startAsAnchor("BB:BB:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
       func = DW1000Ranging.loop_anchor;
     }
     //to make it run first time
@@ -125,7 +125,7 @@ void setup()
     
     //starting BLE
     Serial.println("Initializing BLE");
-    std::string BLEID = "SPGH-DEVICE-DEV1";
+    std::string BLEID = "SPGH-DEVICE-DEV3";
     esp_base_mac_addr_set(&newMACAddress[0]);
     BLEDevice::init(BLEID);
     Serial.println(BLEID.c_str());

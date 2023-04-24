@@ -1474,9 +1474,7 @@ bool DW1000RangingClass::decodeInputParams(char inputString[], int inputStringLe
 		EEPROM.commit();
 		Serial.println(tagMode);
 		ESP.restart();
-	} else {
-		return false;
-	}
+	} 
 	for(int i = 0; i < 5; i++) {
 		anchorAddressFromSerial.push_back(inputString[i]);
 	}
