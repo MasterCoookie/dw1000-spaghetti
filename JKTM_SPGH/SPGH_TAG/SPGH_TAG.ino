@@ -155,8 +155,8 @@ void initCom(String dataString) {
     char buf[inputLength+1];
     dataString.toCharArray(buf, inputLength+1);
     if(DW1000Ranging.decodeInputParams(buf, inputLength)) {
-      anchorAddresses[0].clear();
-      anchorAddresses[1].clear();
+      anchorAddresses = nullptr;
+      delete anchorAddresses;
       anchorAddresses = DW1000Ranging.getAnchorAddressesFromSerial();
     }
 }

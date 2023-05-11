@@ -1484,8 +1484,6 @@ bool DW1000RangingClass::decodeInputParams(char inputString[], int inputStringLe
 	}
 	anchorAddressTable[0] = anchorAddressFromSerial;
 	anchorAddressTable[1] = secondAnchorAddress;
-	// Serial.println(anchorAddressFromSerial.c_str());
-	// Serial.println(secondAnchorAddress.c_str());
 	return true;
 }
 
