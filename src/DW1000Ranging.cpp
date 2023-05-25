@@ -92,6 +92,9 @@ uint32_t  DW1000RangingClass::_lastActivity;
 uint32_t  DW1000RangingClass::_resetPeriod;
 uint32_t  DW1000RangingClass::timeoutPeriod = 400;
 
+std::map<char*, float> DW1000RangingClass::anchors;
+size_t DW1000RangingClass::anchorsSize;
+size_t DW1000RangingClass::sweepFreq;
 
 // reply times (same on both sides for symm. ranging)
 uint16_t  DW1000RangingClass::_replyDelayTimeUS;
@@ -420,6 +423,11 @@ void DW1000RangingClass::timeoutTAG(bool& anchorAdressesIndex) {
 		}
 		return; // TODO cc
 	}
+}
+
+void DW1000RangingClass::pushAnchor(char anchorAddress[]) {
+	anchors[anchorAddress] = 999.f;
+	++anchorsSize;
 }
 
 void DW1000RangingClass::prepareForAnotherRound() {				
@@ -1446,7 +1454,8 @@ void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCoun
 	timeOutResetCount = resetCount;
 	minimalSerialPrint = minimalPrint;
 	delayAfterCommunication = delayAfterCom;
-
+	anchorsSize = 0;
+	sweepFreq = 10;
 }
 
 bool DW1000RangingClass::decodeInputParams(char inputString[], int inputStringLength) {

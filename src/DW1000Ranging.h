@@ -33,6 +33,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
+#include <map>
 
 // messages used in the ranging protocol
 #define NDEBUG
@@ -147,7 +148,8 @@ public:
 	static void setCycleCounter();
 	static std::string * getAnchorAddressesFromSerial();
 	static int getRangingProtocolNumber();
-	static bool decodeInputParams(char inputString[], int inputStringLength);  
+	static bool decodeInputParams(char inputString[], int inputStringLength);
+	static void pushAnchor(char anchorAddress[]);
 
 private:
 	//other devices in the network
@@ -229,8 +231,9 @@ private:
 	inline static DW1000Device* myStaticAnchor;
 	inline static DW1000Device* myStaticTag;
 	inline static bool initProtocol;
-	
-	
+	static std::map<char*, float> anchors;
+	static size_t anchorsSize;
+	static size_t sweepFreq;
 	
 	//methods
 	static void handleSent();

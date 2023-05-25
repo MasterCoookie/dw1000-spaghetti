@@ -110,7 +110,12 @@ void setup()
     //to make it run first time
     DW1000Ranging.setSentAck(true);
     DW1000Ranging.beginProtocol();
-  
+
+    DW1000Ranging.pushAnchor("AA:00");
+    DW1000Ranging.pushAnchor("AA:01");
+    DW1000Ranging.pushAnchor("AA:02");
+    DW1000Ranging.pushAnchor("AA:03");
+
     Serial.println("DW1000 setup complete");
     
     //starting BLE
