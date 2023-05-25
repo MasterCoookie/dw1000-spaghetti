@@ -33,7 +33,9 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-#include <map>
+#include <unordered_map>
+#include <algorithm>
+#include <vector>
 
 // messages used in the ranging protocol
 #define NDEBUG
@@ -232,7 +234,7 @@ private:
 	inline static DW1000Device* myStaticAnchor;
 	inline static DW1000Device* myStaticTag;
 	inline static bool initProtocol;
-	static std::map<char*, float> anchors;
+	static std::unordered_map<char*, float> anchors;
 	static size_t anchorsSize;
 	static size_t sweepFreq;
 	static size_t sweepIndex;

@@ -92,7 +92,7 @@ uint32_t  DW1000RangingClass::_lastActivity;
 uint32_t  DW1000RangingClass::_resetPeriod;
 uint32_t  DW1000RangingClass::timeoutPeriod = 400;
 
-std::map<char*, float> DW1000RangingClass::anchors;
+std::unordered_map<char*, float> DW1000RangingClass::anchors;
 size_t DW1000RangingClass::anchorsSize;
 size_t DW1000RangingClass::sweepFreq;
 size_t DW1000RangingClass::sweepIndex;
@@ -395,7 +395,7 @@ void DW1000RangingClass::timeoutTAG(bool& anchorAdressesIndex) {
 			// Serial.println("Timed out!");
 			if(isSweeping) {
 				char addrString[60];
-				sprintf(addrString, "%02X:%02X",_currentShortAddress[0], _currentShortAddress[1]);
+				sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
 				Serial.print(addrString);
 				Serial.println(" sweep timed out!");
 				anchors[addrString] = 999.f;
@@ -664,9 +664,9 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 					// printShortAddresses();
 
 					if(isSweeping){
-						Serial.print("Sweep ")
+						Serial.print("Sweep ");
 						char addrString[60];
-						sprintf(addrString, "%02X:%02X",_currentShortAddress[0], _currentShortAddress[1]);
+						sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
 						Serial.print(addrString);
 						Serial.print(" distance: ");
 						Serial.println(curRange);
@@ -698,7 +698,7 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 							// Serial.println(_replyDelayTimeUS);
 							
 						}
-
+						++mesurementsTowardsSweeep;
 						if(pReadCharacteristic != nullptr) {
 							if(!anchorAdressesIndex) {
 								Serial.println(returnedMsg.c_str());
@@ -1496,6 +1496,11 @@ void DW1000RangingClass::checkSweeping() {
 		isSweeping = false;
 		mesurementsTowardsSweeep = 0;
 		sweepIndex = 0;
+
+
+		//sort
+		std::vector<std::pair<char *, float>> elems(anchors.begin(), anchors.end());
+		std::sort(elems.begin(), elems.end());
 
 		auto it = anchors.begin();
 		anchorAddressTable[0] = it->first;

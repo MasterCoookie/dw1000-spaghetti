@@ -160,6 +160,8 @@ void loop()
 {
   // Serial.println("[APP] Free memory: " + String(esp_get_free_heap_size()) + " bytes");
     DW1000Ranging.checkSweeping();
+    //TODO cc
+    anchorAddresses = DW1000Ranging.getAnchorAddressesFromSerial();
     DW1000Ranging.loop_tag(const_cast<char*>(anchorAddresses[anchorAdressesIndex].c_str()), anchorAdressesIndex, pReadCharacteristic);
     //Serial.print("isMeasunring: ");
     //Serial.println(DW1000Ranging.isMeasuring);
