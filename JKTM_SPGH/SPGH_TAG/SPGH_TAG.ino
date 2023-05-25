@@ -22,11 +22,9 @@ uint8_t newMACAddress[] = {0x90, 0x84, 0x2B, 0x4A, 0x3A, 0x0A};
 const uint8_t PIN_RST = 27; // reset pin
 const uint8_t PIN_IRQ = 34; // irq pin
 const uint8_t PIN_SS = 4;   // spi select pin
-int cycleCount = 9999;
 int limiter = 200;
 std::string anchorAddress;
 char anchorAddressChar[5];
-int numberOfRangingProtocols;
 int serialInputLength = 0;
 int inputLength = 0;
 
@@ -146,36 +144,32 @@ void initCom(String dataString) {
     if(DW1000Ranging.decodeInputParams(buf, inputLength)) {
       anchorAddress.clear();
       anchorAddress = DW1000Ranging.getAnchorAddressFromSerial();
-      numberOfRangingProtocols = DW1000Ranging.getRangingProtocolNumber();
       strcpy(anchorAddressChar, anchorAddress.c_str());
-      limiter = numberOfRangingProtocols;
-      cycleCount = 0;
       DW1000Ranging.setCycleCounter();
     }
 }
 
 void loop()
 {
-  if(cycleCount < limiter) {   
+  if(!receivedComData) {
     DW1000Ranging.loop_tag(anchorAddressChar, pReadCharacteristic);
-    cycleCount = DW1000Ranging.getCycleCounter();
     //Serial.println(cycleCount);
     // DW1000Ranging.loop();
   }
-  else if(receivedComData)
-  {
-    receivedComData = false;
-    initCom(currentData);
-  } else if(receivedDelayData) {
+  
+  if(receivedDelayData) {
     receivedDelayData = false;
     Serial.print("Dealay set (int): ");
     Serial.println(currentData.toInt());
     DW1000Ranging.setDelay(currentData.toInt());
   } else if(IF_SERIAL && Serial.available() != 0) {
-  if(Serial.available() != 0) {
-    String serialString = Serial.readString();
-    initCom(serialString);
+    if(Serial.available() != 0) {
+      String serialString = Serial.readString();
+      initCom(serialString);
     }
+  } else {
+    receivedComData = false;
+    initCom(currentData);
   }
 }
 

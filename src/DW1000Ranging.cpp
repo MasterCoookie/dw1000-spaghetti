@@ -1429,24 +1429,7 @@ bool DW1000RangingClass::decodeInputParams(char inputString[], int inputStringLe
 	for(int i = 0; i < 5; i++) {
 		anchorAddressFromSerial.push_back(inputString[i]);
 	}
-	std::string numberOfProtocolsString;
-	for(int i = 5; i < inputStringLength; i++) {
-		numberOfProtocolsString.push_back(inputString[i]);
-	}
-	try {
-		int numberOfProtocols = std::stoi(numberOfProtocolsString);
-		if(DEBUG) {
-			Serial.println(numberOfProtocols);
-		}
-		rangingProtocolNumber = numberOfProtocols;
-		return true;
-	}
-	catch(std::invalid_argument& e) {
-		if(DEBUG) {
-			Serial.println("Parsing failure.");
-		}
-	}
-	return false;
+	return true;
 }
 
 int DW1000RangingClass::getCycleCounter() {
