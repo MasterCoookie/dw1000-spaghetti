@@ -95,6 +95,9 @@ uint32_t  DW1000RangingClass::timeoutPeriod = 400;
 std::map<char*, float> DW1000RangingClass::anchors;
 size_t DW1000RangingClass::anchorsSize;
 size_t DW1000RangingClass::sweepFreq;
+size_t DW1000RangingClass::sweepIndex;
+size_t DW1000RangingClass::mesurementsTowardsSweeep;
+size_t DW1000RangingClass::isSweeping;
 
 // reply times (same on both sides for symm. ranging)
 uint16_t  DW1000RangingClass::_replyDelayTimeUS;
@@ -1456,6 +1459,9 @@ void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCoun
 	delayAfterCommunication = delayAfterCom;
 	anchorsSize = 0;
 	sweepFreq = 10;
+	sweepIndex = 0;
+	mesurementsTowardsSweeep = sweepFreq;
+	isSweeping = false;
 }
 
 bool DW1000RangingClass::decodeInputParams(char inputString[], int inputStringLength) {

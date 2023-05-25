@@ -234,6 +234,9 @@ private:
 	static std::map<char*, float> anchors;
 	static size_t anchorsSize;
 	static size_t sweepFreq;
+	static size_t sweepIndex;
+	static size_t mesurementsTowardsSweeep;
+	static bool isSweeping;
 	
 	//methods
 	static void handleSent();
