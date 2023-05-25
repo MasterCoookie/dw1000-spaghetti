@@ -150,6 +150,7 @@ public:
 	static int getRangingProtocolNumber();
 	static bool decodeInputParams(char inputString[], int inputStringLength);
 	static void pushAnchor(char anchorAddress[]);
+	static void checkSweeping();
 
 private:
 	//other devices in the network

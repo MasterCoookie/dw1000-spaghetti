@@ -97,7 +97,7 @@ size_t DW1000RangingClass::anchorsSize;
 size_t DW1000RangingClass::sweepFreq;
 size_t DW1000RangingClass::sweepIndex;
 size_t DW1000RangingClass::mesurementsTowardsSweeep;
-size_t DW1000RangingClass::isSweeping;
+bool DW1000RangingClass::isSweeping;
 
 // reply times (same on both sides for symm. ranging)
 uint16_t  DW1000RangingClass::_replyDelayTimeUS;
@@ -393,30 +393,39 @@ void DW1000RangingClass::timeoutTAG(bool& anchorAdressesIndex) {
 				ESP.restart();
 			}*/
 			// Serial.println("Timed out!");
-			if(anchorAdressesIndex) {
-				returnedMsg += "_";
+			if(isSweeping) {
 				char addrString[60];
-				sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
-				returnedMsg += addrString;
-				for(int i=0; i < 5; i++) {
-					returnedMsg += tagAddress[i];
-				}
+				sprintf(addrString, "%02X:%02X",_currentShortAddress[0], _currentShortAddress[1]);
+				Serial.print(addrString);
+				Serial.println(" sweep timed out!");
+				anchors[addrString] = 999.f;
+				++sweepIndex;
+			} else {
+				if(anchorAdressesIndex) {
+					returnedMsg += "_";
+					char addrString[60];
+					sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
+					returnedMsg += addrString;
+					for(int i=0; i < 5; i++) {
+						returnedMsg += tagAddress[i];
+					}
 
-				returnedMsg += "|Timed out!";	
-			}
-			else {
-				Serial.println(returnedMsg.c_str());
-				returnedMsg = "";
-				isMeasuring = false;
-				char addrString[60];
-				sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
-				returnedMsg += addrString;
-				for(int i=0; i < 5; i++) {
-					returnedMsg += tagAddress[i];
+					returnedMsg += "|Timed out!";	
 				}
-				returnedMsg += "|Timed out!";
+				else {
+					Serial.println(returnedMsg.c_str());
+					returnedMsg = "";
+					isMeasuring = false;
+					char addrString[60];
+					sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
+					returnedMsg += addrString;
+					for(int i=0; i < 5; i++) {
+						returnedMsg += tagAddress[i];
+					}
+					returnedMsg += "|Timed out!";
+				}
+				anchorAdressesIndex = !anchorAdressesIndex;
 			}
-			anchorAdressesIndex = !anchorAdressesIndex;
 			delete myStaticAnchor;
 			++cycleCounter;
 			protocolEnd = true;
@@ -654,56 +663,70 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 					++cycleCounter;
 					// printShortAddresses();
 
-					if(!minimalSerialPrint) {
-						Serial.print("Range: ");
-						Serial.print(curRange);
-						Serial.print(" m ");
-					} else {
-						// Serial.print("|");
-						// Serial.print(curRange);
-					}
-					
-
-					if(!minimalSerialPrint) {
-						Serial.print("RX power: ");
-						Serial.print(curRXPower);
-						Serial.println(" dBm");
-					} else {
-						// Serial.print("|");
-						// Serial.print(curRXPower);
-						// Serial.print("|");
-						// Serial.println(_replyDelayTimeUS);
-						
-					}
-
-					if(pReadCharacteristic != nullptr) {
-						if(!anchorAdressesIndex) {
-							Serial.println(returnedMsg.c_str());
-							returnedMsg = "";
-							isMeasuring = false;
-						}
-						else {
-							returnedMsg += "_";
-						}
-						
+					if(isSweeping){
+						Serial.print("Sweep ")
 						char addrString[60];
-						sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
-						returnedMsg += addrString;
 						sprintf(addrString, "%02X:%02X",_currentShortAddress[0], _currentShortAddress[1]);
-						returnedMsg += addrString;
-						returnedMsg += "|";
-						std::string s = std::to_string(curRange);
-						returnedMsg += s.c_str();
-						returnedMsg += "|";
-						s = std::to_string(curRXPower);
-						returnedMsg += s.c_str();
-						pReadCharacteristic->setValue(returnedMsg.c_str());
-						anchorAdressesIndex = !anchorAdressesIndex;
-						//isMeasuring = anchorAdressesIndex;
-						
-						delete myStaticAnchor;
-					}
+						Serial.print(addrString);
+						Serial.print(" distance: ");
+						Serial.println(curRange);
 
+						anchors[addrString] = curRange;
+						++sweepIndex;
+
+						delete myStaticAnchor;
+					} else {
+
+						if(!minimalSerialPrint) {
+							Serial.print("Range: ");
+							Serial.print(curRange);
+							Serial.print(" m ");
+						} else {
+							// Serial.print("|");
+							// Serial.print(curRange);
+						}
+						
+
+						if(!minimalSerialPrint) {
+							Serial.print("RX power: ");
+							Serial.print(curRXPower);
+							Serial.println(" dBm");
+						} else {
+							// Serial.print("|");
+							// Serial.print(curRXPower);
+							// Serial.print("|");
+							// Serial.println(_replyDelayTimeUS);
+							
+						}
+
+						if(pReadCharacteristic != nullptr) {
+							if(!anchorAdressesIndex) {
+								Serial.println(returnedMsg.c_str());
+								returnedMsg = "";
+								isMeasuring = false;
+							}
+							else {
+								returnedMsg += "_";
+							}
+							
+							char addrString[60];
+							sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
+							returnedMsg += addrString;
+							sprintf(addrString, "%02X:%02X",_currentShortAddress[0], _currentShortAddress[1]);
+							returnedMsg += addrString;
+							returnedMsg += "|";
+							std::string s = std::to_string(curRange);
+							returnedMsg += s.c_str();
+							returnedMsg += "|";
+							s = std::to_string(curRXPower);
+							returnedMsg += s.c_str();
+							pReadCharacteristic->setValue(returnedMsg.c_str());
+							anchorAdressesIndex = !anchorAdressesIndex;
+							//isMeasuring = anchorAdressesIndex;
+							
+							delete myStaticAnchor;
+						}
+					}
 
 					currentTimeStamp = millis();
 					protocolEnd = true;
@@ -1462,6 +1485,14 @@ void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCoun
 	sweepIndex = 0;
 	mesurementsTowardsSweeep = sweepFreq;
 	isSweeping = false;
+}
+
+void DW1000RangingClass::checkSweeping() {
+	if(!isSweeping && mesurementsTowardsSweeep >= sweepFreq){
+		isSweeping = true;
+		mesurementsTowardsSweeep = 0;
+		sweepIndex = 0;
+	}
 }
 
 bool DW1000RangingClass::decodeInputParams(char inputString[], int inputStringLength) {
