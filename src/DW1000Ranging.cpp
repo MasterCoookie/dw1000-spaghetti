@@ -1492,6 +1492,15 @@ void DW1000RangingClass::checkSweeping() {
 		isSweeping = true;
 		mesurementsTowardsSweeep = 0;
 		sweepIndex = 0;
+	} else if(isSweeping && sweepIndex >= anchorsSize){
+		isSweeping = false;
+		mesurementsTowardsSweeep = 0;
+		sweepIndex = 0;
+
+		auto it = anchors.begin();
+		anchorAddressTable[0] = it->first;
+		++it;
+		anchorAddressTable[1] = it->first;
 	}
 }
 
