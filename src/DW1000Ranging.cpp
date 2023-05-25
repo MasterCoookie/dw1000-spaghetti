@@ -92,7 +92,8 @@ uint32_t  DW1000RangingClass::_lastActivity;
 uint32_t  DW1000RangingClass::_resetPeriod;
 uint32_t  DW1000RangingClass::timeoutPeriod = 400;
 
-std::unordered_map<char*, float> DW1000RangingClass::anchors;
+std::map<char*, float> DW1000RangingClass::anchors;
+std::vector<char*> DW1000RangingClass::anchorsVector;
 size_t DW1000RangingClass::anchorsSize;
 size_t DW1000RangingClass::sweepFreq;
 size_t DW1000RangingClass::sweepIndex;
@@ -394,11 +395,15 @@ void DW1000RangingClass::timeoutTAG(bool& anchorAdressesIndex) {
 			}*/
 			// Serial.println("Timed out!");
 			if(isSweeping) {
-				char addrString[60];
-				sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
-				Serial.print(addrString);
+				char* anchor_address = anchorsVector[sweepIndex];
+
+				Serial.print("index: ");
+				Serial.print(sweepIndex);
+				Serial.print(" ");
+
+				Serial.print(anchor_address);
 				Serial.println(" sweep timed out!");
-				anchors[addrString] = 999.f;
+				anchors[anchor_address] = 999.f;
 				++sweepIndex;
 			} else {
 				if(anchorAdressesIndex) {
@@ -425,6 +430,7 @@ void DW1000RangingClass::timeoutTAG(bool& anchorAdressesIndex) {
 					returnedMsg += "|Timed out!";
 				}
 				anchorAdressesIndex = !anchorAdressesIndex;
+				++mesurementsTowardsSweeep;
 			}
 			delete myStaticAnchor;
 			++cycleCounter;
@@ -438,7 +444,8 @@ void DW1000RangingClass::timeoutTAG(bool& anchorAdressesIndex) {
 }
 
 void DW1000RangingClass::pushAnchor(char anchorAddress[]) {
-	anchors[anchorAddress] = 999.f;
+	anchors[anchorAddress] = 420.f;
+	anchorsVector.push_back(anchorAddress);
 	++anchorsSize;
 }
 
@@ -530,7 +537,12 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 			_replyDelayTimeUS = randomDelayTime;
 		}
 		else {
-			DW1000.convertToByte(anchor_address, anchor_address_byte);
+			if(isSweeping) {
+				DW1000.convertToByte(anchorsVector[sweepIndex], anchor_address_byte);
+			} else {
+				DW1000.convertToByte(anchor_address, anchor_address_byte);
+			}
+			
 			_replyDelayTimeUS = DEFAULT_REPLY_DELAY_TIME;
 		}
 
@@ -665,13 +677,14 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 
 					if(isSweeping){
 						Serial.print("Sweep ");
-						char addrString[60];
-						sprintf(addrString, "%02X:%02X",destinationAddress[0], destinationAddress[1]);
-						Serial.print(addrString);
+						char* anchor_address = anchorsVector[sweepIndex];
+						Serial.print(anchor_address);
+						Serial.print(" index: ");
+						Serial.print(sweepIndex);
 						Serial.print(" distance: ");
 						Serial.println(curRange);
 
-						anchors[addrString] = curRange;
+						anchors[anchor_address] = curRange;
 						++sweepIndex;
 
 						delete myStaticAnchor;
@@ -1497,15 +1510,36 @@ void DW1000RangingClass::checkSweeping() {
 		mesurementsTowardsSweeep = 0;
 		sweepIndex = 0;
 
-
-		//sort
-		std::vector<std::pair<char *, float>> elems(anchors.begin(), anchors.end());
-		std::sort(elems.begin(), elems.end());
-
+		//print map
 		auto it = anchors.begin();
-		anchorAddressTable[0] = it->first;
-		++it;
-		anchorAddressTable[1] = it->first;
+		 while (it != anchors.end())
+		{
+			Serial.print("Anchor: ");
+			Serial.print(it->first);
+			Serial.print(" Distance: ");
+			Serial.println(it->second);
+			++it;
+		}
+
+
+
+		std::vector<std::pair<char*, float>> pairs;
+		for (auto itr = anchors.begin(); itr != anchors.end(); ++itr)
+			pairs.push_back(*itr);
+
+		sort(pairs.begin(), pairs.end(), [=](std::pair<char*, float>& a, std::pair<char*, float>& b)
+		{
+			return a.second < b.second;
+		}
+		);
+
+		// auto it = anchors.begin();
+		// anchorAddressTable[0] = it->first;
+		// it++;
+		// anchorAddressTable[1] = it->first;
+		anchorAddressTable[0] = pairs[0].first;
+		anchorAddressTable[1] = pairs[1].first;
+
 	}
 }
 

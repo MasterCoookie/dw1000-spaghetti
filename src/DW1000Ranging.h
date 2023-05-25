@@ -33,7 +33,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-#include <unordered_map>
+#include <map>
 #include <algorithm>
 #include <vector>
 
@@ -74,8 +74,7 @@
 #define DEBUG false
 #endif
 
-#define RANDOM_DELAY_TABLE_MODE true
-
+#define RANDOM_DELAY_TABLE_MODE false
 class DW1000RangingClass {
 public:
 	//variables
@@ -234,7 +233,8 @@ private:
 	inline static DW1000Device* myStaticAnchor;
 	inline static DW1000Device* myStaticTag;
 	inline static bool initProtocol;
-	static std::unordered_map<char*, float> anchors;
+	static std::map<char*, float> anchors;
+	static std::vector<char*> anchorsVector;
 	static size_t anchorsSize;
 	static size_t sweepFreq;
 	static size_t sweepIndex;
