@@ -676,12 +676,21 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 					// printShortAddresses();
 
 					if(isSweeping){
-						Serial.print("Sweep ");
 						char* anchor_address = anchorsVector[sweepIndex];
-						Serial.print(anchor_address);
-						Serial.print(" index: ");
-						Serial.print(sweepIndex);
-						Serial.print(" distance: ");
+						if(minimalSerialPrint) {
+							Serial.print("S");
+							Serial.print(sweepIndex);
+							Serial.print("|");
+							Serial.print(anchor_address);
+							Serial.print("|");
+						} else {
+							Serial.print("Sweep ");
+							Serial.print(anchor_address);
+							Serial.print(" index: ");
+							Serial.print(sweepIndex);
+							Serial.print(" distance: ");
+						}
+						
 						Serial.println(curRange);
 
 						anchors[anchor_address] = curRange;
@@ -1535,11 +1544,6 @@ void DW1000RangingClass::checkSweeping() {
 			}
 		}
 			
-
-		// auto it = anchors.begin();
-		// anchorAddressTable[0] = it->first;
-		// it++;
-		// anchorAddressTable[1] = it->first;
 		anchorAddressTable[0] = closest.first;
 		anchorAddressTable[1] = closest_2.first;
 
