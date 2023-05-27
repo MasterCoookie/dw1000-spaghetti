@@ -683,15 +683,19 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 							Serial.print("|");
 							Serial.print(anchor_address);
 							Serial.print("|");
+							Serial.print(curRange);
+							Serial.print("|");
 						} else {
 							Serial.print("Sweep ");
 							Serial.print(anchor_address);
 							Serial.print(" index: ");
 							Serial.print(sweepIndex);
 							Serial.print(" distance: ");
+							Serial.print(curRange);
+							Serial.print(" RX power: ");
 						}
 						
-						Serial.println(curRange);
+						Serial.println(curRXPower);
 
 						anchors[anchor_address] = curRange;
 						++sweepIndex;
