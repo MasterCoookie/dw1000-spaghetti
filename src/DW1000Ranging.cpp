@@ -1488,13 +1488,13 @@ void DW1000RangingClass::receiver() {
 	DW1000.startReceive();
 }
 
-void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom) {
+void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom, size_t _sweepFreq) {
 	timeoutPeriod = timeoutTime;
 	timeOutResetCount = resetCount;
 	minimalSerialPrint = minimalPrint;
 	delayAfterCommunication = delayAfterCom;
 	anchorsSize = 0;
-	sweepFreq = 10;
+	sweepFreq = _sweepFreq;
 	sweepIndex = 0;
 	mesurementsTowardsSweeep = sweepFreq;
 	isSweeping = false;

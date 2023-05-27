@@ -135,7 +135,7 @@ public:
 	static void displayFullAddress(byte address[]);
 	static void displayShortAddress(byte datas[]);
 	static void beginProtocol();
-	static void initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom);
+	static void initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom, size_t _sweepFreq);
 	static void timeoutTAG(bool& anchorAdressesIndex);
 	static void timeoutANCHOR();
 	static void prepareForAnotherRound();
