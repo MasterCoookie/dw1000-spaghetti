@@ -1511,16 +1511,16 @@ void DW1000RangingClass::checkSweeping() {
 		sweepIndex = 0;
 
 		//print map
-		auto it = anchors.begin();
-		 while (it != anchors.end())
-		{
-			Serial.print("Anchor: ");
-			Serial.print(it->first);
-			Serial.print(" Distance: ");
-			Serial.println(it->second);
-			++it;
+		if(DEBUG) {
+			auto it = anchors.begin();
+			while (it != anchors.end()) {
+				Serial.print("Anchor: ");
+				Serial.print(it->first);
+				Serial.print(" Distance: ");
+				Serial.println(it->second);
+				++it;
+			}
 		}
-
 
 
 		std::pair <char*, float> closest("00:00", 999.f);
