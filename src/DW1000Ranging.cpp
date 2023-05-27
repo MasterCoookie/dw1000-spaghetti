@@ -1523,22 +1523,25 @@ void DW1000RangingClass::checkSweeping() {
 
 
 
-		std::vector<std::pair<char*, float>> pairs;
-		for (auto itr = anchors.begin(); itr != anchors.end(); ++itr)
-			pairs.push_back(*itr);
+		std::pair <char*, float> closest("00:00", 999.f);
+		std::pair <char*, float> closest_2("00:00", 999.f);
 
-		sort(pairs.begin(), pairs.end(), [=](std::pair<char*, float>& a, std::pair<char*, float>& b)
-		{
-			return a.second < b.second;
+		for (auto it = anchors.begin(); it != anchors.end(); ++it) {
+			if(it->second < closest.second){
+				closest_2 = closest;
+				closest = *it;
+			} else if(it->second < closest_2.second){
+				closest_2 = *it;
+			}
 		}
-		);
+			
 
 		// auto it = anchors.begin();
 		// anchorAddressTable[0] = it->first;
 		// it++;
 		// anchorAddressTable[1] = it->first;
-		anchorAddressTable[0] = pairs[0].first;
-		anchorAddressTable[1] = pairs[1].first;
+		anchorAddressTable[0] = closest.first;
+		anchorAddressTable[1] = closest_2.first;
 
 	}
 }
