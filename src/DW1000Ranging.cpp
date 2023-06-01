@@ -397,12 +397,20 @@ void DW1000RangingClass::timeoutTAG(bool& anchorAdressesIndex) {
 			if(isSweeping) {
 				char* anchor_address = anchorsVector[sweepIndex];
 
-				Serial.print("index: ");
-				Serial.print(sweepIndex);
-				Serial.print(" ");
+				if(!minimalSerialPrint) {
+					Serial.print("index: ");
+					Serial.print(sweepIndex);
+					Serial.print(" ");
 
-				Serial.print(anchor_address);
-				Serial.println(" sweep timed out!");
+					Serial.print(anchor_address);
+					Serial.println(" sweep timed out!");
+				} else {
+					Serial.print("S");
+					Serial.print(sweepIndex);
+					Serial.print("|");
+					Serial.print(anchor_address);
+					Serial.println("|Timed out!");
+				}
 				anchors[anchor_address] = 999.f;
 				++sweepIndex;
 			} else {
