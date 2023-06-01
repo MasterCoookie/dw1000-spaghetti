@@ -101,6 +101,9 @@ size_t DW1000RangingClass::mesurementsTowardsSweeep;
 bool DW1000RangingClass::isSweeping;
 float DW1000RangingClass::successMesurementWeight;
 float DW1000RangingClass::failMesurementWeight;
+std::pair <char*, float> DW1000RangingClass::closestAnchor;
+std::pair <char*, float> DW1000RangingClass::secondClosestAnchor;
+
 
 // reply times (same on both sides for symm. ranging)
 uint16_t  DW1000RangingClass::_replyDelayTimeUS;
@@ -1520,9 +1523,12 @@ void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCoun
 	successMesurementWeight = _successMesurementWeight;
 	failMesurementWeight = _failMesurementWeight;
 	mesurementsTowardsSweeep = sweepFreq;
+
 	anchorsSize = 0;
 	sweepIndex = 0;
 	isSweeping = false;
+	closestAnchor = std::make_pair((char *)"00:00", 999.f);
+	secondClosestAnchor = std::make_pair((char *)"00:00", 999.f);
 }
 
 void DW1000RangingClass::checkSweeping() {
@@ -1548,20 +1554,23 @@ void DW1000RangingClass::checkSweeping() {
 		}
 
 
-		std::pair <char*, float> closest("00:00", 999.f);
-		std::pair <char*, float> closest_2("00:00", 999.f);
+		// std::pair <char*, float> closest("00:00", 999.f);
+		// std::pair <char*, float> closest_2("00:00", 999.f);
 
 		for (auto it = anchors.begin(); it != anchors.end(); ++it) {
-			if(it->second < closest.second){
-				closest_2 = closest;
-				closest = *it;
-			} else if(it->second < closest_2.second){
-				closest_2 = *it;
+			if(it->second < closestAnchor.second){
+				secondClosestAnchor = closestAnchor;
+				closestAnchor = *it;
+			} else if(it->second < secondClosestAnchor.second){
+				secondClosestAnchor = *it;
 			}
 		}
-			
-		anchorAddressTable[0] = closest.first;
-		anchorAddressTable[1] = closest_2.first;
+		
+		anchorAddressTable[0] = closestAnchor.first;
+		anchorAddressTable[1] = secondClosestAnchor.first;
+
+		closestAnchor = std::make_pair((char *)"00:00", 999.f);
+		secondClosestAnchor = std::make_pair((char *)"00:00", 999.f);
 
 	}
 }

@@ -165,11 +165,6 @@ private:
 	static int32_t      timer;
 	static int16_t      counterForBlink;
 	
-
-	
-  
-
-	
 	
 	static long long int cycleCounter;
 	static uint32_t currentTimeStamp;
@@ -242,6 +237,8 @@ private:
 	static bool isSweeping;
 	static float successMesurementWeight;
 	static float failMesurementWeight;
+	static std::pair <char*, float> closestAnchor;
+	static std::pair <char*, float> secondClosestAnchor;
 	
 	//methods
 	static void handleSent();
