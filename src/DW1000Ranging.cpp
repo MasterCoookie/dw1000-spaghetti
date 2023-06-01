@@ -99,6 +99,8 @@ size_t DW1000RangingClass::sweepFreq;
 size_t DW1000RangingClass::sweepIndex;
 size_t DW1000RangingClass::mesurementsTowardsSweeep;
 bool DW1000RangingClass::isSweeping;
+float DW1000RangingClass::successMesurementWeight;
+float DW1000RangingClass::failMesurementWeight;
 
 // reply times (same on both sides for symm. ranging)
 uint16_t  DW1000RangingClass::_replyDelayTimeUS;
@@ -438,7 +440,7 @@ void DW1000RangingClass::timeoutTAG(bool& anchorAdressesIndex) {
 					returnedMsg += "|Timed out!";
 				}
 				anchorAdressesIndex = !anchorAdressesIndex;
-				++mesurementsTowardsSweeep;
+				mesurementsTowardsSweeep += failMesurementWeight;
 			}
 			delete myStaticAnchor;
 			++cycleCounter;
@@ -732,7 +734,7 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 							// Serial.println(_replyDelayTimeUS);
 							
 						}
-						++mesurementsTowardsSweeep;
+						mesurementsTowardsSweeep += successMesurementWeight;
 						if(pReadCharacteristic != nullptr) {
 							if(!anchorAdressesIndex) {
 								Serial.println(returnedMsg.c_str());
@@ -1509,15 +1511,17 @@ void DW1000RangingClass::receiver() {
 	DW1000.startReceive();
 }
 
-void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom, size_t _sweepFreq) {
+void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom, size_t _sweepFreq, float _successMesurementWeight, float _failMesurementWeight) {
 	timeoutPeriod = timeoutTime;
 	timeOutResetCount = resetCount;
 	minimalSerialPrint = minimalPrint;
 	delayAfterCommunication = delayAfterCom;
-	anchorsSize = 0;
 	sweepFreq = _sweepFreq;
-	sweepIndex = 0;
+	successMesurementWeight = _successMesurementWeight;
+	failMesurementWeight = _failMesurementWeight;
 	mesurementsTowardsSweeep = sweepFreq;
+	anchorsSize = 0;
+	sweepIndex = 0;
 	isSweeping = false;
 }
 

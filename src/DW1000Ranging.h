@@ -135,7 +135,7 @@ public:
 	static void displayFullAddress(byte address[]);
 	static void displayShortAddress(byte datas[]);
 	static void beginProtocol();
-	static void initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom, size_t _sweepFreq);
+	static void initializeVariables(uint32_t timeoutTime, int resetCount, bool minimalPrint, int delayAfterCom, size_t _sweepFreq, float _successMesurementWeight, float _failMesurementWeight);
 	static void timeoutTAG(bool& anchorAdressesIndex);
 	static void timeoutANCHOR();
 	static void prepareForAnotherRound();
@@ -240,6 +240,8 @@ private:
 	static size_t sweepIndex;
 	static size_t mesurementsTowardsSweeep;
 	static bool isSweeping;
+	static float successMesurementWeight;
+	static float failMesurementWeight;
 	
 	//methods
 	static void handleSent();
