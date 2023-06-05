@@ -1533,6 +1533,8 @@ void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCoun
 
 void DW1000RangingClass::checkSweeping() {
 	if(!isSweeping && mesurementsTowardsSweeep >= sweepFreq){
+		Serial.print("SWEEP ");
+		Serial.println(anchorsSize);
 		isSweeping = true;
 		mesurementsTowardsSweeep = 0;
 		sweepIndex = 0;
