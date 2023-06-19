@@ -105,17 +105,18 @@ void setup()
 
     //we start the module as a tag
   
-    DW1000Ranging.initializeVariables(250, 10, true, 110, 120, 5, 30);
-    DW1000Ranging.startAsTag("AA:AA:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
+    DW1000Ranging.initializeVariables(250, 10, true, 97, 120, 5, 30);
+    // DW1000Ranging.initializeVariables(250, 10, true, 53, 120, 5, 30);
+    DW1000Ranging.startAsTag("BB:BB:22:EA:82:60:3B:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY, false);
     //to make it run first time
     DW1000Ranging.setSentAck(true);
     DW1000Ranging.beginProtocol();
 
-    DW1000Ranging.pushAnchor("AA:00");
-    DW1000Ranging.pushAnchor("AA:01");
-    DW1000Ranging.pushAnchor("AA:02");
-    DW1000Ranging.pushAnchor("AA:03");
-    // DW1000Ranging.pushAnchor("AA:04");
+    DW1000Ranging.pushAnchor("BB:00");
+    DW1000Ranging.pushAnchor("BB:01");
+    DW1000Ranging.pushAnchor("BB:02");
+    DW1000Ranging.pushAnchor("BB:03");
+    // DW1000Ranging.pushAnchor("BB:04");
 
     Serial.println("DW1000 setup complete");
     

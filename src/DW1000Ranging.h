@@ -233,8 +233,10 @@ private:
 	static size_t anchorsSize;
 	static size_t sweepFreq;
 	static size_t sweepIndex;
+	static size_t sweepSuccessCounter;
 	static size_t mesurementsTowardsSweeep;
 	static bool isSweeping;
+	static bool didSweepFail;
 	static float successMesurementWeight;
 	static float failMesurementWeight;
 	static std::pair <char*, float> closestAnchor;

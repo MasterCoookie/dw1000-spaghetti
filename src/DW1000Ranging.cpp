@@ -97,8 +97,10 @@ std::vector<char*> DW1000RangingClass::anchorsVector;
 size_t DW1000RangingClass::anchorsSize;
 size_t DW1000RangingClass::sweepFreq;
 size_t DW1000RangingClass::sweepIndex;
+size_t DW1000RangingClass::sweepSuccessCounter;
 size_t DW1000RangingClass::mesurementsTowardsSweeep;
 bool DW1000RangingClass::isSweeping;
+bool DW1000RangingClass::didSweepFail;
 float DW1000RangingClass::successMesurementWeight;
 float DW1000RangingClass::failMesurementWeight;
 std::pair <char*, float> DW1000RangingClass::closestAnchor;
@@ -716,6 +718,7 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 
 						anchors[anchor_address] = curRange;
 						++sweepIndex;
+						++sweepSuccessCounter;
 
 						delete myStaticAnchor;
 					} else {
@@ -1528,24 +1531,38 @@ void DW1000RangingClass::initializeVariables(uint32_t timeoutTime, int resetCoun
 	failMesurementWeight = _failMesurementWeight;
 	mesurementsTowardsSweeep = sweepFreq;
 
+	sweepSuccessCounter = 0;
 	anchorsSize = 0;
 	sweepIndex = 0;
 	isSweeping = false;
+	didSweepFail = false;
 	closestAnchor = std::make_pair((char *)"00:00", 999.f);
 	secondClosestAnchor = std::make_pair((char *)"00:00", 999.f);
 }
 
 void DW1000RangingClass::checkSweeping() {
-	if(!isSweeping && mesurementsTowardsSweeep >= sweepFreq){
+	if((!isSweeping && mesurementsTowardsSweeep >= sweepFreq) || didSweepFail){
 		Serial.print("SWEEP ");
 		Serial.println(anchorsSize);
+
 		isSweeping = true;
+		didSweepFail = false;
+
 		mesurementsTowardsSweeep = 0;
 		sweepIndex = 0;
 	} else if(isSweeping && sweepIndex >= anchorsSize){
 		isSweeping = false;
 		mesurementsTowardsSweeep = 0;
 		sweepIndex = 0;
+
+		if(sweepSuccessCounter >= 2){
+			Serial.println("SWEEP SUCCESS");
+			sweepSuccessCounter = 0;
+		} else {
+			Serial.println("SWEEP FAIL");
+			didSweepFail = true;
+			sweepSuccessCounter = 0;
+		}
 
 		//print map
 		if(DEBUG) {
