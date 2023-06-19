@@ -546,7 +546,11 @@ bool DW1000RangingClass::loop_tag(char anchor_address[], bool &anchorAdressesInd
 				randomNumber-=73;
 			}
 			int randomDelayTime = delayTable[randomNumber];
-			DW1000.convertToByte(anchor_address, anchor_address_byte);
+			if(isSweeping) {
+				DW1000.convertToByte(anchorsVector[sweepIndex], anchor_address_byte);
+			} else {
+				DW1000.convertToByte(anchor_address, anchor_address_byte);
+			}
 			_replyDelayTimeUS = randomDelayTime;
 		}
 		else {
